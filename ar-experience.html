@@ -1,583 +1,249 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <title>ARStudio — Experiencia AR</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>ARStudio — Ver en tu espacio</title>
 
+  <!--
+    model-viewer v3.4 — Google
+    Detecta superficies automáticamente, sin marcador:
+      · Android con ARCore  → WebXR Hit Testing (en el navegador, apuntás al piso/mesa)
+      · Android sin ARCore  → Scene Viewer (app nativa de Google AR)
+      · iOS Safari          → Quick Look (AR nativa de Apple)
+    Docs: https://modelviewer.dev
+  -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #0a0a0a;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    /* ─── MODEL VIEWER fullscreen ─── */
+    model-viewer {
+      width: 100%;
+      height: 100%;
+      --poster-color: #0a0a0a;
+      background-color: #111;
+    }
+
+    /* ─── HEADER ─── */
+    .ar-header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.25rem 1.5rem;
+      pointer-events: none;
+    }
+    .ar-logo {
+      font-size: 1rem; font-weight: 700; color: #fff;
+      letter-spacing: -0.02em; text-shadow: 0 1px 8px rgba(0,0,0,0.8);
+    }
+    .ar-logo span { color: #c8ff3e; }
+    .ar-back {
+      pointer-events: all;
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.2);
+      color: #fff; font-size: 0.8rem; padding: 0.45rem 0.9rem;
+      border-radius: 2rem; text-decoration: none; backdrop-filter: blur(8px);
+    }
+
+    /* ─── BOTÓN "Ver en tu espacio" — sloteado dentro de model-viewer ─── */
+    .btn-ar {
+      background: #c8ff3e; color: #0a0a0a;
+      font-weight: 700; font-size: 0.9rem;
+      padding: 0.85rem 2rem; border: none; border-radius: 2rem;
+      cursor: pointer; white-space: nowrap;
+      box-shadow: 0 4px 20px rgba(200,255,62,0.4);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+
+    /* ─── BADGE sin AR ─── */
+    #no-ar-badge {
+      display: none;
+      position: fixed; top: 5.5rem; left: 50%; transform: translateX(-50%);
+      background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.3);
+      color: rgba(255,200,150,0.9); font-size: 0.75rem;
+      padding: 0.5rem 1rem; border-radius: 2rem; z-index: 100;
+      white-space: nowrap;
+    }
+
+    /* ─── PANEL PRODUCTO ─── */
+    .product-panel {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+      background: rgba(0,0,0,0.65);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px 20px 0 0;
+      padding: 1.25rem 1.5rem 2.5rem;
+      backdrop-filter: blur(16px);
+    }
+    .product-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 1rem; margin-bottom: 1rem;
+    }
+    .product-name { color: #fff; font-size: 1.1rem; font-weight: 600; line-height: 1.2; }
+    .product-desc { color: rgba(255,255,255,0.55); font-size: 0.8rem; margin-top: 4px; line-height: 1.5; }
+    .product-price {
+      color: #c8ff3e; font-size: 1.4rem; font-weight: 700;
+      white-space: nowrap; text-shadow: 0 0 20px rgba(200,255,62,0.4);
+    }
+    .product-actions { display: flex; gap: 0.75rem; }
+    .btn-buy {
+      flex: 1; background: #c8ff3e; color: #0a0a0a;
+      font-weight: 700; font-size: 0.875rem;
+      border: none; border-radius: 12px; padding: 0.8rem; cursor: pointer;
+    }
+    .btn-buy:active { filter: brightness(0.88); }
+    .btn-share {
+      width: 44px; height: 44px;
+      background: rgba(255,255,255,0.1); color: #fff;
+      border: 1px solid rgba(255,255,255,0.2); border-radius: 12px;
+      cursor: pointer; font-size: 1.2rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ─── TOAST ─── */
+    #toast {
+      position: fixed; bottom: 11rem; left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: rgba(10,10,10,0.9); color: #fff;
+      padding: 0.6rem 1.2rem; border-radius: 2rem;
+      font-size: 0.82rem; z-index: 200;
+      opacity: 0; transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none; white-space: nowrap;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+  <header class="ar-header">
+    <div class="ar-logo">AR<span>Studio</span></div>
+    <a class="ar-back" href="/">← Volver</a>
+  </header>
+
+  <div id="no-ar-badge">AR no disponible — podés rotar el modelo con los dedos</div>
+
+  <!--
+    src="./modelo.glb"  → tu modelo 3D (descargalo de poly.pizza o sketchfab y renombralo)
+    Si modelo.glb no existe el script de abajo carga un modelo de demostración.
+
+    ar-modes en orden de preferencia:
+      webxr       → Chrome Android + ARCore: detección de superficie en el navegador
+      scene-viewer→ Android sin ARCore: abre la app Scene Viewer de Google
+      quick-look  → iOS Safari: abre Quick Look de Apple
+
+    ar-scale="fixed" → el objeto mantiene su escala real al colocarlo en el espacio
+  -->
+  <model-viewer
+    id="mv"
+    src="./modelo.glb"
+    alt="Producto en realidad aumentada"
+    ar
+    ar-modes="webxr scene-viewer quick-look"
+    ar-scale="fixed"
+    camera-controls
+    touch-action="pan-y"
+    auto-rotate
+    auto-rotate-delay="800"
+    rotation-per-second="25deg"
+    shadow-intensity="1"
+    shadow-softness="0.8"
+    environment-image="neutral"
+    exposure="1"
+    style="width:100%;height:100%;"
+  >
     <!--
-    ═══════════════════════════════════════════════════════════════
-      LIBRERÍAS (cargadas desde CDN — NO requieren instalación)
-      A-Frame:  Framework WebXR declarativo (escenas 3D con HTML)
-      AR.js:    Marker tracking en el navegador (ARToolKit → WASM)
-    ═══════════════════════════════════════════════════════════════
+      Este botón aparece sobre el visor 3D.
+      Al tocarlo lanza la experiencia AR de superficie:
+        · En Android abre la cámara con detección de piso/mesa
+        · En iOS abre Quick Look con el modelo listo para colocar
     -->
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <button slot="ar-button" class="btn-ar" id="ar-btn">
+      📱 Ver en tu espacio
+    </button>
+  </model-viewer>
 
-    <style>
-      /* ─── RESET ─── */
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
-
-      /* ─── FIX PANTALLA NEGRA — explicación completa ──────────────
-         Problema: <a-scene embedded> queda con tamaño 0x0 en el DOM.
-         El canvas WebGL vive DENTRO de a-scene, así que también es 0x0.
-         AR.js crea un <video id="arjs-video"> en document.body que
-         tampoco tiene tamaño asignado por defecto.
-         Solución: forzar a-scene, canvas y video a cubrir 100% del
-         viewport con position:fixed, y hacer el canvas transparente
-         para que el video se vea debajo.
-      ─────────────────────────────────────────────────────────── */
-
-      /* 1. a-scene ocupa todo el viewport */
-      a-scene {
-        position: fixed !important;
-        top: 0 !important; left: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        z-index: 1;
-      }
-
-      /* 2. canvas WebGL transparente encima del video */
-      .a-canvas, canvas {
-        position: fixed !important;
-        top: 0 !important; left: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        background: transparent !important;
-        z-index: 2;
-      }
-
-      /* 3. video de AR.js cubre toda la pantalla debajo del canvas */
-      #arjs-video,
-      body > video,
-      a-scene video {
-        position: fixed !important;
-        top: 0 !important; left: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: cover !important;
-        z-index: 0 !important;
-      }
-
-      /* ─── OVERLAY UI (se muestra sobre la cámara) ─── */
-      #ui-overlay {
-        position: fixed;
-        inset: 0;
-        z-index: 10;
-        pointer-events: none; /* clicks pasan al canvas AR */
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        padding: 1.5rem;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      }
-
-      /* ─── HEADER ─── */
-      .ar-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        pointer-events: all;
-      }
-      .ar-logo {
-        font-size: 1rem;
-        font-weight: 700;
-        color: #fff;
-        letter-spacing: -0.02em;
-        text-shadow: 0 1px 8px rgba(0,0,0,0.6);
-      }
-      .ar-logo span { color: #c8ff3e; }
-      .ar-back {
-        display: flex; align-items: center; gap: 6px;
-        background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.2);
-        color: #fff; font-size: 0.8rem; padding: 0.45rem 0.9rem;
-        border-radius: 2rem; text-decoration: none; backdrop-filter: blur(8px);
-        transition: background 0.2s;
-      }
-      .ar-back:hover { background: rgba(0,0,0,0.65); }
-
-      /* ─── ESTADO / HINT ─── */
-      #status-bar {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        pointer-events: none;
-        z-index: 10;
-      }
-      #status-pill {
-        display: flex; align-items: center; gap: 8px;
-        background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.15);
-        color: #fff; font-size: 0.85rem; padding: 0.6rem 1.2rem;
-        border-radius: 2rem; backdrop-filter: blur(10px);
-        white-space: nowrap;
-        transition: opacity 0.4s;
-      }
-      #status-pill.hidden { opacity: 0; }
-      .status-dot {
-        width: 8px; height: 8px; border-radius: 50%; background: #c8ff3e;
-        animation: blink 1.4s infinite;
-      }
-      @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
-
-      /* ─── PANEL DE PRODUCTO (parte inferior) ─── */
-      .product-panel {
-        background: rgba(0,0,0,0.55);
-        border: 1px solid rgba(255,255,255,0.12);
-        border-radius: 20px;
-        padding: 1.25rem 1.5rem;
-        backdrop-filter: blur(14px);
-        pointer-events: all;
-        transition: opacity 0.4s, transform 0.4s;
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      .product-panel.visible {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      .product-top {
-        display: flex; align-items: flex-start;
-        justify-content: space-between; gap: 1rem;
-        margin-bottom: 1rem;
-      }
-      .product-name {
-        color: #fff; font-size: 1.1rem; font-weight: 600;
-        line-height: 1.2;
-      }
-      .product-desc {
-        color: rgba(255,255,255,0.6); font-size: 0.8rem;
-        margin-top: 4px; line-height: 1.5;
-      }
-      .product-price {
-        color: #c8ff3e; font-size: 1.4rem; font-weight: 700;
-        white-space: nowrap; text-shadow: 0 0 20px rgba(200,255,62,0.4);
-      }
-      .product-actions {
-        display: flex; gap: 0.75rem;
-      }
-      .btn-buy {
-        flex: 1;
-        background: #c8ff3e; color: #0a0a0a;
-        font-weight: 700; font-size: 0.875rem;
-        border: none; border-radius: 12px;
-        padding: 0.8rem; cursor: pointer;
-        transition: transform 0.15s, filter 0.15s;
-      }
-      .btn-buy:hover { transform: scale(1.02); filter: brightness(1.1); }
-      .btn-buy:active { transform: scale(0.98); }
-      .btn-share {
-        width: 44px; height: 44px;
-        background: rgba(255,255,255,0.1); color: #fff;
-        border: 1px solid rgba(255,255,255,0.2); border-radius: 12px;
-        cursor: pointer; display: flex; align-items: center; justify-content: center;
-        font-size: 1.1rem; transition: background 0.2s;
-      }
-      .btn-share:hover { background: rgba(255,255,255,0.2); }
-
-      /* ─── CONTROLES de modelo ─── */
-      .controls-row {
-        display: flex; gap: 0.5rem; margin-top: 0.75rem;
-      }
-      .ctrl-btn {
-        flex: 1;
-        background: rgba(255,255,255,0.08);
-        border: 1px solid rgba(255,255,255,0.12);
-        color: rgba(255,255,255,0.7); font-size: 0.75rem;
-        border-radius: 10px; padding: 0.5rem 0;
-        cursor: pointer; transition: background 0.2s;
-      }
-      .ctrl-btn:hover { background: rgba(255,255,255,0.15); }
-      .ctrl-btn.active { background: rgba(200,255,62,0.15); color: #c8ff3e; border-color: rgba(200,255,62,0.3); }
-
-      /* ─── TOAST ─── */
-      #toast {
-        position: fixed; bottom: 2rem; left: 50%;
-        transform: translateX(-50%) translateY(20px);
-        background: rgba(10,10,10,0.9); color: #fff;
-        padding: 0.6rem 1.2rem; border-radius: 2rem;
-        font-size: 0.82rem; z-index: 100;
-        opacity: 0; transition: opacity 0.3s, transform 0.3s;
-        pointer-events: none; white-space: nowrap;
-      }
-      #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-      /* ─── INSTRUCCIÓN MARCADOR ─── */
-      #marker-hint {
-        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        z-index: 9; pointer-events: none;
-        display: flex; flex-direction: column; align-items: center; gap: 1rem;
-        transition: opacity 0.5s;
-      }
-      #marker-hint.hidden { opacity: 0; }
-      .marker-frame {
-        width: 160px; height: 160px;
-        border: 2px dashed rgba(255,255,255,0.4); border-radius: 12px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 3rem;
-        animation: frameAnim 2s ease-in-out infinite;
-      }
-      @keyframes frameAnim {
-        0%,100%{ border-color: rgba(255,255,255,0.3); transform: scale(1); }
-        50%{ border-color: rgba(200,255,62,0.6); transform: scale(1.04); }
-      }
-      .marker-text {
-        color: rgba(255,255,255,0.8); font-size: 0.82rem;
-        text-align: center; text-shadow: 0 1px 6px rgba(0,0,0,0.8);
-        max-width: 200px; line-height: 1.5;
-      }
-    </style>
-  </head>
-  <body>
-
-    <!--
-    ═══════════════════════════════════════════════════════════════
-      ESCENA AR — Todo lo 3D va dentro de <a-scene>
-      
-      Atributos clave de arjs:
-        trackingMethod: best   → usa el mejor método disponible
-        sourceType: webcam     → usa la cámara trasera
-        debugUIEnabled: false  → oculta el panel de debug de AR.js
-    ═══════════════════════════════════════════════════════════════
-    -->
-    <a-scene
-      embedded
-      arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
-      renderer="alpha: true; logarithmicDepthBuffer: true; antialias: true;"
-      background="color: transparent; transparent: true"
-      vr-mode-ui="enabled: false"
-      loading-screen="enabled: false"
-    >
-
-      <!--
-        ASSETS — Todos los recursos 3D se precargan aquí.
-        Cambiá el src por tu propio modelo .glb o .gltf
-        
-        Modelos gratis:
-          https://poly.pizza        (modelos low-poly, gratis, GLTF)
-          https://sketchfab.com     (buscar "free download")
-          https://market.pmnd.rs    (modelos optimizados para web)
-      -->
-      <a-assets>
-        <!--
-          OPCIÓN A: Modelo GLTF/GLB (recomendado)
-          Descargá un .glb y ponélo en la misma carpeta
-        -->
-        <a-asset-item id="producto-3d" src="modelo.glb"></a-asset-item>
-
-        <!--
-          OPCIÓN B: Si no tenés modelo propio todavía,
-          usamos primitivas de A-Frame como placeholder.
-          Comentá el asset-item de arriba y descomentá
-          las primitivas en el marcador más abajo.
-        -->
-      </a-assets>
-
-      <!--
-        MARCADOR HIRO — El más compatible de AR.js
-        preset="hiro" usa el marcador Hiro estándar.
-        
-        Imprimí el marcador desde: marker.html (en este repo)
-        O descargá el PNG: https://jeromeetienne.github.io/AR.js/data/images/HIRO.jpg
-        
-        Otras opciones:
-          preset="kanji"            → marcador alternativo
-          type="barcode" value="1"  → marcadores QR/barcode personalizados
-          url="mi-marcador.patt"    → marcador completamente custom
-      -->
-      <a-marker preset="hiro" id="marker-hiro">
-
-        <!--
-          MODELO GLTF (descomentá cuando tengas tu archivo .glb)
-        -->
-        <a-entity
-          id="modelo-ar"
-          gltf-model="#producto-3d"
-          position="0 0.5 0"
-          scale="0.5 0.5 0.5"
-          rotation="-90 0 0"
-          animation="
-            property: rotation;
-            from: -90 0 0;
-            to: -90 360 0;
-            loop: true;
-            dur: 8000;
-            easing: linear;
-          "
-        ></a-entity>
-
-        <!--
-          MODELO PLACEHOLDER (borrar cuando tengas tu .glb)
-          Muestra una caja animada para testear el tracking
-        -->
-        <a-entity id="placeholder" position="0 0.5 0">
-          <!-- Caja principal del producto -->
-          <a-box
-            position="0 0 0"
-            width="0.8" height="0.8" depth="0.8"
-            color="#c8ff3e"
-            material="roughness: 0.3; metalness: 0.6;"
-            animation="
-              property: rotation;
-              to: 0 360 0;
-              loop: true;
-              dur: 5000;
-              easing: linear;
-            "
-          ></a-box>
-
-          <!-- Esfera decorativa arriba -->
-          <a-sphere
-            position="0 0.8 0"
-            radius="0.18"
-            color="#ff6b35"
-            material="roughness: 0.2; metalness: 0.8;"
-            animation="
-              property: position;
-              from: 0 0.8 0;
-              to: 0 1.1 0;
-              dir: alternate;
-              loop: true;
-              dur: 1200;
-              easing: easeInOutSine;
-            "
-          ></a-sphere>
-
-          <!-- Sombra / base plana -->
-          <a-circle
-            position="0 -0.41 0"
-            rotation="-90 0 0"
-            radius="0.6"
-            color="#000"
-            opacity="0.3"
-          ></a-circle>
-        </a-entity>
-
-        <!--
-          LUZ SOBRE EL MODELO
-          Point light da profundidad y realismo al 3D
-        -->
-        <a-light type="point" color="#ffffff" intensity="0.8" position="1 2 1"></a-light>
-        <a-light type="ambient" color="#ffffff" intensity="0.4"></a-light>
-
-      </a-marker>
-
-      <!-- Cámara AR (siempre requerida) -->
-      <a-entity camera></a-entity>
-
-    </a-scene>
-
-    <!--
-    ═══════════════════════════════════════════════════════════════
-      OVERLAY DE UI — Se renderiza sobre el canvas de la cámara
-    ═══════════════════════════════════════════════════════════════
-    -->
-    <div id="ui-overlay">
-      <!-- Header -->
-      <div class="ar-header">
-        <div class="ar-logo">AR<span>Studio</span></div>
-        <a href="index.html" class="ar-back">← Volver</a>
+  <div class="product-panel">
+    <div class="product-top">
+      <div>
+        <div class="product-name" id="product-name">Silla Eames Replica</div>
+        <div class="product-desc" id="product-desc">Madera de nogal · Cuero genuino</div>
       </div>
-
-      <!-- Panel inferior del producto -->
-      <div class="product-panel" id="product-panel">
-        <div class="product-top">
-          <div>
-            <div class="product-name" id="product-name">Silla Eames Replica</div>
-            <div class="product-desc" id="product-desc">Madera de nogal · Cuero genuino · Alto: 84cm</div>
-          </div>
-          <div class="product-price" id="product-price">$189.990</div>
-        </div>
-        <div class="controls-row">
-          <button class="ctrl-btn active" onclick="changeColor('original')">Original</button>
-          <button class="ctrl-btn" onclick="changeColor('dark')">Negro</button>
-          <button class="ctrl-btn" onclick="changeColor('light')">Blanco</button>
-          <button class="ctrl-btn" onclick="changeColor('accent')">Lima</button>
-        </div>
-        <div class="product-actions" style="margin-top: 0.75rem;">
-          <button class="btn-buy" onclick="handleBuy()">Agregar al carrito</button>
-          <button class="btn-share" onclick="handleShare()" title="Compartir">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-          </button>
-        </div>
-      </div>
+      <div class="product-price" id="product-price">$189.990</div>
     </div>
-
-    <!-- Status pill (centro pantalla) -->
-    <div id="status-bar">
-      <div id="status-pill">
-        <div class="status-dot"></div>
-        <span id="status-text">Buscando marcador...</span>
-      </div>
+    <div class="product-actions">
+      <button class="btn-buy" onclick="handleBuy(this)">Agregar al carrito</button>
+      <button class="btn-share" onclick="handleShare()" title="Compartir">↑</button>
     </div>
+  </div>
 
-    <!-- Hint visual cuando no hay marcador detectado -->
-    <div id="marker-hint">
-      <div class="marker-frame">🎯</div>
-      <div class="marker-text">Apuntá la cámara al marcador Hiro impreso</div>
-    </div>
+  <div id="toast"></div>
 
-    <!-- Toast de feedback -->
-    <div id="toast"></div>
+  <script>
+    const mv = document.getElementById('mv');
 
-    <!--
-    ═══════════════════════════════════════════════════════════════
-      JAVASCRIPT — Lógica de la experiencia AR
-    ═══════════════════════════════════════════════════════════════
-    -->
-    <script>
-      // ─── Colores predefinidos para el placeholder ───────────────
-      const COLOR_VARIANTS = {
-        original: '#c8ff3e',
-        dark:     '#1a1a1a',
-        light:    '#f5f3ef',
-        accent:   '#ff6b35',
-      };
-
-      // ─── Estado ─────────────────────────────────────────────────
-      let markerVisible = false;
-
-      // ─── Referencias al DOM ──────────────────────────────────────
-      const panel       = document.getElementById('product-panel');
-      const statusPill  = document.getElementById('status-pill');
-      const statusText  = document.getElementById('status-text');
-      const markerHint  = document.getElementById('marker-hint');
-      const toast       = document.getElementById('toast');
-
-      // ─── Detectar marcador visible ───────────────────────────────
-      document.querySelector('#marker-hiro').addEventListener('markerFound', () => {
-        markerVisible = true;
-
-        // Mostrar panel de producto
-        panel.classList.add('visible');
-
-        // Ocultar hints
-        markerHint.classList.add('hidden');
-        statusPill.classList.add('hidden');
-      });
-
-      // ─── Marcador perdido ────────────────────────────────────────
-      document.querySelector('#marker-hiro').addEventListener('markerLost', () => {
-        markerVisible = false;
-
-        // Ocultar panel y mostrar hints de búsqueda
-        panel.classList.remove('visible');
-        markerHint.classList.remove('hidden');
-        statusPill.classList.remove('hidden');
-        statusText.textContent = 'Buscando marcador...';
-      });
-
-      // ─── Cambio de color del placeholder ────────────────────────
-      function changeColor(variant) {
-        const box = document.querySelector('a-box');
-        if (box) {
-          box.setAttribute('color', COLOR_VARIANTS[variant]);
-        }
-
-        // Actualizar botones activos
-        document.querySelectorAll('.ctrl-btn').forEach(b => b.classList.remove('active'));
-        event.target.classList.add('active');
-
-        // Si tenés un modelo GLTF real, acá podés cambiar su material:
-        // const modelo = document.querySelector('#modelo-ar');
-        // modelo.setAttribute('material', `color: ${COLOR_VARIANTS[variant]}`);
-
-        showToast(`Color cambiado: ${variant}`);
+    // ─── Fallback si modelo.glb no existe ───────────────────────────────
+    // model-viewer dispara 'error' si no puede cargar el src.
+    // Cargamos un modelo de demo de Google hasta que tengan su propio .glb.
+    // Modelos gratuitos para reemplazarlo: https://poly.pizza  https://sketchfab.com
+    mv.addEventListener('error', () => {
+      if (!mv.src.includes('modelviewer.dev')) {
+        mv.setAttribute('src', 'https://modelviewer.dev/shared-assets/models/Astronaut.glb');
+        document.getElementById('product-name').textContent = 'Modelo de demostración';
+        document.getElementById('product-desc').textContent = 'Agregá modelo.glb para usar tu propio producto';
+        showToast('Sin modelo.glb — cargando demo');
       }
+    });
 
-      // ─── Agregar al carrito ──────────────────────────────────────
-      function handleBuy() {
-        showToast('✓ Agregado al carrito');
-
-        // Animación de feedback en el botón
-        const btn = event.target;
-        btn.textContent = '¡Agregado! ✓';
-        btn.style.background = '#a8e600';
-        setTimeout(() => {
-          btn.textContent = 'Agregar al carrito';
-          btn.style.background = '';
-        }, 2000);
+    // ─── Detectar soporte AR ─────────────────────────────────────────────
+    mv.addEventListener('load', () => {
+      if (!mv.canActivateAR) {
+        document.getElementById('no-ar-badge').style.display = 'block';
+        document.getElementById('ar-btn').style.display = 'none';
       }
+    });
 
-      // ─── Compartir ───────────────────────────────────────────────
-      function handleShare() {
-        if (navigator.share) {
-          navigator.share({
-            title: 'ARStudio — Ver producto en AR',
-            text: '¡Mirá este producto en realidad aumentada!',
-            url: window.location.href,
-          }).catch(() => {});
-        } else {
-          navigator.clipboard.writeText(window.location.href)
-            .then(() => showToast('Link copiado al portapapeles'))
-            .catch(() => showToast('Compartí este link: ' + window.location.href));
-        }
+    // ─── Agregar al carrito ──────────────────────────────────────────────
+    function handleBuy(btn) {
+      showToast('✓ Agregado al carrito');
+      btn.textContent = '¡Agregado! ✓';
+      btn.style.background = '#a8e600';
+      setTimeout(() => {
+        btn.textContent = 'Agregar al carrito';
+        btn.style.background = '';
+      }, 2000);
+    }
+
+    // ─── Compartir ───────────────────────────────────────────────────────
+    function handleShare() {
+      if (navigator.share) {
+        navigator.share({
+          title: 'ARStudio — Ver producto en AR',
+          text: '¡Mirá este producto en realidad aumentada!',
+          url: window.location.href,
+        }).catch(() => {});
+      } else {
+        navigator.clipboard?.writeText(window.location.href)
+          .then(() => showToast('Link copiado al portapapeles'))
+          .catch(() => showToast('Compartí: ' + window.location.href));
       }
+    }
 
-      // ─── Utilidad: mostrar toast ─────────────────────────────────
-      function showToast(msg, duration = 2200) {
-        toast.textContent = msg;
-        toast.classList.add('show');
-        clearTimeout(toast._timer);
-        toast._timer = setTimeout(() => toast.classList.remove('show'), duration);
-      }
-
-      // ─── Fix dinámico: AR.js crea el <video> de forma asíncrona ──
-      // El CSS de arriba no puede aplicar a un elemento que no existe aún.
-      // Usamos MutationObserver para detectarlo en cuanto aparece en el DOM
-      // y le aplicamos el estilo fullscreen inmediatamente.
-      const fixVideoStyle = (video) => {
-        video.style.cssText =
-          'position:fixed!important;top:0!important;left:0!important;' +
-          'width:100%!important;height:100%!important;' +
-          'object-fit:cover!important;z-index:0!important;';
-      };
-
-      const videoObserver = new MutationObserver(() => {
-        const vid = document.getElementById('arjs-video')
-          || document.querySelector('body > video')
-          || document.querySelector('a-scene video');
-        if (vid) {
-          fixVideoStyle(vid);
-          videoObserver.disconnect();
-          console.log('[ARStudio] Video AR.js encontrado y estirado al viewport.');
-        }
-      });
-      videoObserver.observe(document.body, { childList: true, subtree: true });
-
-      // ─── Detectar si AR.js cargó correctamente ───────────────────
-      window.addEventListener('load', () => {
-        // Aplicar fix al video si ya existe en este punto
-        const vidNow = document.getElementById('arjs-video') || document.querySelector('video');
-        if (vidNow) fixVideoStyle(vidNow);
-
-        statusText.textContent = 'Inicializando cámara...';
-        console.log('[ARStudio] Experiencia iniciada. Esperando marcador Hiro...');
-
-        // Si en varios segundos no aparece marcador, mensaje de espera normal.
-        setTimeout(() => {
-          if (!markerVisible) {
-            statusText.textContent = 'Buscando marcador Hiro...';
-          }
-        }, 4500);
-      });
-
-      // AR.js dispara camera-init cuando el stream de cámara se abre correctamente.
-      document.querySelector('a-scene').addEventListener('camera-init', () => {
-        statusText.textContent = 'Buscando marcador...';
-      });
-
-      // ─── Handle errores de cámara ────────────────────────────────
-      // AR.js arroja este evento si no puede acceder a la cámara
-      document.querySelector('a-scene').addEventListener('camera-error', () => {
-        statusText.textContent = 'Error: aceptá el permiso de cámara';
-        statusPill.classList.remove('hidden');
-      });
-    </script>
-
-  </body>
+    // ─── Toast ───────────────────────────────────────────────────────────
+    function showToast(msg, duration = 2500) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(() => toast.classList.remove('show'), duration);
+    }
+  </script>
+</body>
 </html>
