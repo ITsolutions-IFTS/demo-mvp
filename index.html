@@ -314,7 +314,7 @@ footer {
     <a href="#setup">Setup</a>
     <a href="#stack">Stack</a>
   </div>
-  <a href="ar-experience.html" class="nav-cta">Abrir AR →</a>
+  <a href="qr.html" class="nav-cta">Abrir QR →</a>
 </nav>
 
 <section class="hero">
@@ -365,14 +365,14 @@ footer {
     <div class="step-card">
       <div class="step-icon">🎯</div>
       <div class="step-num">02</div>
-      <div class="step-title">Apuntá al marcador</div>
-      <div class="step-desc">La cámara detecta el marcador impreso (hoja A4 o tarjeta). En tiendas físicas o enviado por email.</div>
+      <div class="step-title">Abrí la cámara AR</div>
+      <div class="step-desc">El celular solicita abrir la experiencia AR. No hay marcador: la detección es sobre piso o mesa.</div>
     </div>
     <div class="step-card">
       <div class="step-icon">✨</div>
       <div class="step-num">03</div>
-      <div class="step-title">El producto aparece</div>
-      <div class="step-desc">El modelo 3D se ancla al marcador con escala real. El usuario puede girar el celular para verlo desde todos los ángulos.</div>
+      <div class="step-title">Detectá la superficie</div>
+      <div class="step-desc">Apuntando al piso o una mesa bien iluminada, el sistema detecta una superficie y permite colocar el modelo 3D.</div>
     </div>
     <div class="step-card">
       <div class="step-icon">🛒</div>
@@ -388,19 +388,18 @@ footer {
     <div class="demo-visual">
       <div class="demo-icon">📦</div>
       <div class="demo-label">Modelo 3D en vivo</div>
-      <div class="demo-sub-label">Abrí ar-experience.html en tu celular</div>
+      <div class="demo-sub-label">Escaneá el QR y colocá el modelo en tu espacio</div>
     </div>
     <div class="demo-content">
       <div class="section-label">Demo interactiva</div>
       <h2>Probalo ahora mismo</h2>
       <p>
-        Imprimí el marcador Hiro (incluido en este repo como <code>marker.pdf</code>), 
-        abrí la experiencia en tu celular y apuntá la cámara. El producto 3D aparece anclado en el espacio.
-        Funciona en Chrome para Android y Safari para iOS 12+.
+        Escaneá el QR desde tu celular, abrí la experiencia AR y tocá el botón para ver el astronauta o tu producto sobre una superficie real.
+        El flujo recomendado es Chrome en Android con ARCore o Safari/iPhone con Quick Look.
       </p>
-      <a href="ar-experience.html" class="demo-link">
+      <a href="qr.html" class="demo-link">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-        Abrir experiencia AR
+        Abrir QR para celular
       </a>
     </div>
   </div>
@@ -417,28 +416,23 @@ footer {
         <span class="code-filename">ar-experience.html (core)</span>
       </div>
       <pre><span class="cm">&lt;!-- 1. Cargar librerías --&gt;</span>
-<span class="kw">&lt;script</span> <span class="attr">src</span>=<span class="str">"aframe.min.js"</span><span class="kw">&gt;&lt;/script&gt;</span>
-<span class="kw">&lt;script</span> <span class="attr">src</span>=<span class="str">"ar.min.js"</span><span class="kw">&gt;&lt;/script&gt;</span>
+<span class="kw">&lt;script</span> <span class="attr">type</span>=<span class="str">"module"</span>
+  <span class="attr">src</span>=<span class="str">"model-viewer.min.js"</span><span class="kw">&gt;&lt;/script&gt;</span>
 
 <span class="cm">&lt;!-- 2. Escena AR --&gt;</span>
-<span class="kw">&lt;a-scene</span>
-  <span class="attr">embedded</span>
-  <span class="attr">arjs</span>=<span class="str">"trackingMethod: best;"</span><span class="kw">&gt;</span>
+<span class="kw">&lt;model-viewer</span>
+  <span class="attr">src</span>=<span class="str">"./modelo.glb"</span>
+  <span class="attr">ar</span>
+  <span class="attr">ar-modes</span>=<span class="str">"webxr scene-viewer quick-look"</span>
+  <span class="attr">ar-scale</span>=<span class="str">"fixed"</span>
+  <span class="attr">camera-controls</span><span class="kw">&gt;</span>
 
-  <span class="cm">&lt;!-- 3. Modelo 3D sobre el marcador --&gt;</span>
-  <span class="kw">&lt;a-marker</span> <span class="attr">preset</span>=<span class="str">"hiro"</span><span class="kw">&gt;</span>
-    <span class="kw">&lt;a-entity</span>
-      <span class="attr">gltf-model</span>=<span class="str">"#mi-producto"</span>
-      <span class="attr">scale</span>=<span class="str">"0.5 0.5 0.5"</span>
-      <span class="attr">position</span>=<span class="str">"0 0.5 0"</span>
-      <span class="attr">animation</span>=<span class="str">"property: rotation;
-        to: 0 360 0; loop: true;
-        dur: 6000"</span><span class="kw">&gt;
-    &lt;/a-entity&gt;</span>
-  <span class="kw">&lt;/a-marker&gt;</span>
+  <span class="cm">&lt;!-- 3. Botón para abrir cámara y detectar superficie --&gt;</span>
+  <span class="kw">&lt;button</span> <span class="attr">slot</span>=<span class="str">"ar-button"</span><span class="kw">&gt;</span>
+    Ver en tu espacio
+  <span class="kw">&lt;/button&gt;</span>
 
-  <span class="kw">&lt;a-entity</span> <span class="attr">camera</span><span class="kw">&gt;&lt;/a-entity&gt;</span>
-<span class="kw">&lt;/a-scene&gt;</span></pre>
+<span class="kw">&lt;/model-viewer&gt;</span></pre>
     </div>
     <ul class="setup-steps-list">
       <li>
@@ -458,8 +452,8 @@ footer {
       <li>
         <div class="setup-step-n">3</div>
         <div class="setup-step-text">
-          <strong>Imprimí el marcador Hiro</strong>
-          <span>Abrí <code>marker.html</code> en el repo y hacé print. O descargá el PNG para enviarlo por WhatsApp.</span>
+          <strong>Generá o abrí el QR</strong>
+          <span>Abrí <code>qr.html</code> en el repo publicado y escanealo desde el celular para entrar directo a la experiencia.</span>
         </div>
       </li>
       <li>
@@ -518,7 +512,7 @@ footer {
     <div class="footer-logo">AR<span>Studio</span></div>
     <div class="footer-note" style="margin-top: 0.5rem;">MVP universitario · Stack: A-Frame + AR.js + Three.js</div>
   </div>
-  <div class="footer-note">
+          <span>Escaneá el QR, tocá <code>Ver en tu espacio</code>, aceptá abrir la cámara AR y apuntá al piso o una mesa para colocar el modelo.</span>
     Funciona en Chrome Android · Safari iOS 12+ · Sin instalación
   </div>
 </footer>

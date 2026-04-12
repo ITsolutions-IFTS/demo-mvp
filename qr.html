@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QR — ARStudio móvil</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<style>
+  body {
+    font-family: -apple-system, sans-serif;
+    background: #0a0a0a; color: #f5f3ef;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    min-height: 100vh; gap: 1.5rem; padding: 2rem;
+  }
+  h2 { font-size: 1.1rem; color: #c8ff3e; margin: 0; }
+  .card {
+    background: #fff; border-radius: 16px;
+    padding: 1.5rem; display: flex; flex-direction: column;
+    align-items: center; gap: 1rem;
+  }
+  .label { color: #0a0a0a; font-size: 0.75rem; font-weight: 600; text-align: center; max-width: 220px; }
+  code {
+    background: #1a1a1a; color: #c8ff3e;
+    padding: 0.4rem 0.8rem; border-radius: 8px;
+    font-size: 0.78rem; word-break: break-all; text-align: center;
+    max-width: 280px;
+  }
+  .note { font-size: 0.78rem; color: #888; max-width: 360px; text-align: center; line-height: 1.6; }
+  .cta {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0.8rem 1.2rem; background: #c8ff3e; color: #0a0a0a;
+    border-radius: 999px; font-weight: 700; text-decoration: none;
+  }
+</style>
+</head>
+<body>
+
+<h2>ARStudio — QR para celular</h2>
+
+<div class="card">
+  <div class="label">Escaneá con la cámara del celular</div>
+  <div id="qr-ar"></div>
+  <div class="label">Experiencia AR</div>
+</div>
+
+<code id="url-ar">Cargando URL...</code>
+
+<div class="card" style="margin-top:1rem">
+  <div class="label">Landing institucional</div>
+  <div id="qr-index"></div>
+</div>
+
+<code id="url-index">Cargando URL...</code>
+
+<a class="cta" id="open-ar" href="./ar-experience.html">Abrir experiencia en este dispositivo</a>
+
+<div class="note">
+  Escaneá el QR desde otro celular y abrí la experiencia AR.<br>
+  Luego tocá <b>Ver en tu espacio</b>, permití abrir la cámara AR y apuntá a una superficie real para colocar el astronauta o tu producto.<br><br>
+  Si publicás este repo en GitHub Pages, esta página genera automáticamente el QR con la URL correcta del deploy.
+</div>
+
+<script>
+  const arUrl = new URL('./ar-experience.html', window.location.href).href;
+  const indexUrl = new URL('./index.html', window.location.href).href;
+
+  document.getElementById('url-ar').textContent = arUrl;
+  document.getElementById('url-index').textContent = indexUrl;
+  document.getElementById('open-ar').href = arUrl;
+
+  new QRCode(document.getElementById('qr-ar'), {
+    text: arUrl,
+    width: 220, height: 220,
+    colorDark: '#000000', colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+  new QRCode(document.getElementById('qr-index'), {
+    text: indexUrl,
+    width: 180, height: 180,
+    colorDark: '#000000', colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+</script>
+</body>
+</html>

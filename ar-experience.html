@@ -125,8 +125,16 @@
 
   <header class="ar-header">
     <div class="ar-logo">AR<span>Studio</span></div>
-    <a class="ar-back" href="/">← Volver</a>
+    <a class="ar-back" href="./index.html">← Volver</a>
   </header>
+
+  <div id="ar-guide" style="position:fixed;top:5.5rem;left:50%;transform:translateX(-50%);z-index:100;max-width:340px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.14);border-radius:18px;padding:0.9rem 1rem;backdrop-filter:blur(14px);font-size:0.78rem;line-height:1.55;color:rgba(255,255,255,0.88);">
+    <strong style="display:block;color:#fff;margin-bottom:0.3rem;">Probá el flujo completo</strong>
+    1. Tocá <strong style="color:#c8ff3e;">Ver en tu espacio</strong><br>
+    2. Permití abrir la cámara AR<br>
+    3. Apuntá al piso o a una mesa bien iluminada<br>
+    4. Cuando aparezca el indicador de superficie, tocá para colocar el astronauta
+  </div>
 
   <div id="no-ar-badge">AR no disponible — podés rotar el modelo con los dedos</div>
 
@@ -188,6 +196,7 @@
 
   <script>
     const mv = document.getElementById('mv');
+    const arGuide = document.getElementById('ar-guide');
 
     // ─── Fallback si modelo.glb no existe ───────────────────────────────
     // model-viewer dispara 'error' si no puede cargar el src.
@@ -207,6 +216,16 @@
       if (!mv.canActivateAR) {
         document.getElementById('no-ar-badge').style.display = 'block';
         document.getElementById('ar-btn').style.display = 'none';
+        arGuide.innerHTML = '<strong style="display:block;color:#fff;margin-bottom:0.3rem;">Tu dispositivo no expone AR en el navegador</strong>Podés rotar el modelo 3D en pantalla. Para colocarlo sobre superficie, probalo en Chrome Android con ARCore o iPhone con Quick Look.';
+      }
+    });
+
+    mv.addEventListener('ar-status', (event) => {
+      if (event.detail.status === 'session-started') {
+        arGuide.style.display = 'none';
+      }
+      if (event.detail.status === 'failed') {
+        showToast('No se pudo iniciar AR en este dispositivo');
       }
     });
 
