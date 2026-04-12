@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Marcador AR — Imprimir</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #fff; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    min-height: 100vh; font-family: -apple-system, sans-serif;
+    padding: 2rem;
+  }
+  .print-card {
+    border: 2px solid #000; border-radius: 8px;
+    padding: 2rem; text-align: center;
+    max-width: 320px; width: 100%;
+  }
+  h2 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .sub { font-size: 0.75rem; color: #666; margin-bottom: 1.5rem; }
+  .marker-img {
+    width: 200px; height: 200px;
+    border: 4px solid #000; margin: 0 auto;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .marker-img img { width: 100%; height: 100%; }
+  .marker-fallback {
+    width: 100%; height: 100%; background: #000;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 0.7rem; text-align: center; padding: 0.5rem;
+  }
+  .instructions { margin-top: 1.5rem; text-align: left; }
+  .instructions li {
+    font-size: 0.78rem; color: #444; margin-bottom: 0.5rem;
+    list-style: decimal; margin-left: 1.2rem; line-height: 1.5;
+  }
+  .brand { margin-top: 1.5rem; font-size: 0.75rem; color: #999; }
+  .brand strong { color: #000; }
+  @media print {
+    body { padding: 0; }
+    .no-print { display: none; }
+    .print-card { border: none; }
+  }
+</style>
+</head>
+<body>
+<div class="print-card">
+  <h2>Marcador AR — Hiro</h2>
+  <div class="sub">Imprimí esta página y apuntá la cámara aquí</div>
+
+  <div class="marker-img">
+    <!--
+      El marcador Hiro real de AR.js.
+      Si la imagen no carga (sin internet), el cuadrado negro
+      de fallback sirve como referencia para imprimir.
+    -->
+    <img
+      src="https://jeromeetienne.github.io/AR.js/data/images/HIRO.jpg"
+      alt="Marcador Hiro AR.js"
+      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+    />
+    <div class="marker-fallback" style="display:none;">
+      Descargá el marcador Hiro desde:<br>
+      <em>jeromeetienne.github.io/AR.js/data/images/HIRO.jpg</em>
+    </div>
+  </div>
+
+  <div class="instructions">
+    <ol>
+      <li>Imprimí esta página en tamaño A4 o A5</li>
+      <li>Abrí la experiencia AR en tu celular</li>
+      <li>Apuntá la cámara trasera al marcador negro</li>
+      <li>Esperá 1–2 segundos hasta que aparezca el modelo 3D</li>
+    </ol>
+  </div>
+
+  <div class="brand">Una experiencia de <strong>ARStudio</strong></div>
+</div>
+
+<br>
+<button onclick="window.print()" class="no-print"
+  style="padding: 0.75rem 2rem; background: #c8ff3e; border: none;
+  border-radius: 2rem; font-weight: 700; font-size: 0.9rem; cursor: pointer;
+  margin-top: 1rem;">
+  Imprimir marcador
+</button>
+
+<p class="no-print" style="font-size: 0.75rem; color: #999; margin-top: 1rem; text-align: center; max-width: 300px;">
+  También podés mostrar este marcador en la pantalla de otra computadora y apuntar el celular hacia la pantalla.
+</p>
+</body>
+</html>

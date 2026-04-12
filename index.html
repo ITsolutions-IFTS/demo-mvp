@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARStudio — Visualizador AR de Productos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #0a0a0a;
+  --white: #f5f3ef;
+  --accent: #c8ff3e;
+  --accent2: #ff6b35;
+  --gray: #888;
+  --card-bg: #111;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.25rem 3rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px);
+  background: rgba(10,10,10,0.85);
+}
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800; font-size: 1.2rem;
+  letter-spacing: -0.02em;
+}
+.logo span { color: var(--accent); }
+.nav-links { display: flex; gap: 2rem; }
+.nav-links a {
+  color: var(--gray); font-size: 0.875rem;
+  text-decoration: none; letter-spacing: 0.02em;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--white); }
+.nav-cta {
+  background: var(--accent); color: var(--black);
+  font-family: 'Syne', sans-serif; font-weight: 700;
+  font-size: 0.8rem; letter-spacing: 0.04em;
+  padding: 0.55rem 1.25rem; border-radius: 2rem;
+  text-decoration: none; transition: transform 0.15s, background 0.2s;
+}
+.nav-cta:hover { transform: scale(1.04); background: #d4ff52; }
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: grid; place-items: center;
+  padding: 8rem 3rem 6rem;
+  position: relative; overflow: hidden;
+}
+.hero-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 70% 40%, rgba(200,255,62,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 20% 70%, rgba(255,107,53,0.05) 0%, transparent 50%);
+}
+.hero-grid {
+  position: absolute; inset: 0; z-index: 0; opacity: 0.035;
+  background-image: linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+.hero-inner { position: relative; z-index: 1; max-width: 900px; }
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-size: 0.75rem; font-weight: 400; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--accent);
+  border: 1px solid rgba(200,255,62,0.3);
+  padding: 0.4rem 1rem; border-radius: 2rem; margin-bottom: 2rem;
+  animation: fadeUp 0.6s ease both;
+}
+.hero-tag::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent); animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 800; line-height: 1;
+  letter-spacing: -0.04em;
+  animation: fadeUp 0.6s 0.1s ease both;
+}
+h1 em { font-style: normal; color: var(--accent); }
+.hero-sub {
+  margin-top: 1.5rem; font-size: 1.15rem;
+  color: rgba(245,243,239,0.6); max-width: 520px;
+  font-weight: 300; line-height: 1.7;
+  animation: fadeUp 0.6s 0.2s ease both;
+}
+.hero-actions {
+  display: flex; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap;
+  animation: fadeUp 0.6s 0.3s ease both;
+}
+.btn-primary {
+  background: var(--accent); color: var(--black);
+  font-family: 'Syne', sans-serif; font-weight: 700;
+  font-size: 0.9rem; letter-spacing: 0.02em;
+  padding: 0.9rem 2rem; border-radius: 2rem;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(200,255,62,0.3); }
+.btn-secondary {
+  color: var(--white); font-family: 'Syne', sans-serif; font-weight: 500;
+  font-size: 0.9rem; padding: 0.9rem 2rem; border-radius: 2rem;
+  text-decoration: none; border: 1px solid rgba(255,255,255,0.2);
+  transition: border-color 0.2s, background 0.2s;
+}
+.btn-secondary:hover { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.05); }
+.hero-stats {
+  display: flex; gap: 3rem; margin-top: 4rem;
+  animation: fadeUp 0.6s 0.4s ease both;
+}
+.stat-num {
+  font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800;
+  color: var(--white); line-height: 1;
+}
+.stat-num span { color: var(--accent); }
+.stat-label { font-size: 0.8rem; color: var(--gray); margin-top: 0.25rem; letter-spacing: 0.04em; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* SECTION BASE */
+section { padding: 6rem 3rem; }
+.section-label {
+  font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 1rem; font-weight: 500;
+}
+h2 {
+  font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800; letter-spacing: -0.03em; line-height: 1.1;
+}
+.section-sub {
+  color: rgba(245,243,239,0.5); font-size: 1rem;
+  max-width: 480px; margin-top: 0.75rem; line-height: 1.7; font-weight: 300;
+}
+
+/* HOW IT WORKS */
+#como-funciona { border-top: 1px solid rgba(255,255,255,0.06); }
+.steps-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem; margin-top: 3.5rem;
+}
+.step-card {
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px; padding: 2rem 1.75rem;
+  position: relative; overflow: hidden;
+  transition: border-color 0.3s, transform 0.3s;
+}
+.step-card:hover { border-color: rgba(200,255,62,0.2); transform: translateY(-4px); }
+.step-num {
+  font-family: 'Syne', sans-serif; font-size: 4rem; font-weight: 800;
+  color: rgba(255,255,255,0.04); position: absolute;
+  top: 1rem; right: 1.5rem; line-height: 1;
+}
+.step-icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  background: rgba(200,255,62,0.1); display: flex; align-items: center;
+  justify-content: center; font-size: 1.25rem; margin-bottom: 1rem;
+}
+.step-title {
+  font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.step-desc { font-size: 0.875rem; color: rgba(245,243,239,0.5); line-height: 1.6; }
+
+/* DEMO SECTION */
+#demo {
+  background: linear-gradient(180deg, var(--black) 0%, #0f0f0f 100%);
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.demo-inner {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center;
+  max-width: 1100px; margin: 0 auto;
+}
+.demo-visual {
+  aspect-ratio: 1; border-radius: 24px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #141414 100%);
+  border: 1px solid rgba(255,255,255,0.08);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 1rem; position: relative; overflow: hidden;
+}
+.demo-visual::before {
+  content: ''; position: absolute; inset: -1px;
+  background: linear-gradient(135deg, rgba(200,255,62,0.15), transparent 50%, rgba(255,107,53,0.1));
+  border-radius: inherit; pointer-events: none;
+}
+.demo-icon { font-size: 4rem; }
+.demo-label {
+  font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700;
+  color: var(--accent);
+}
+.demo-sub-label { font-size: 0.8rem; color: var(--gray); }
+.demo-content .section-label { margin-bottom: 0.75rem; }
+.demo-content h2 { margin-bottom: 1rem; }
+.demo-content p { color: rgba(245,243,239,0.55); font-size: 0.95rem; line-height: 1.7; margin-bottom: 2rem; }
+.demo-link {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: var(--accent); color: var(--black);
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem;
+  padding: 0.9rem 2rem; border-radius: 2rem; text-decoration: none;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.demo-link:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(200,255,62,0.3); }
+.demo-link svg { width: 16px; height: 16px; }
+
+/* SETUP */
+#setup { border-top: 1px solid rgba(255,255,255,0.06); }
+.setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-top: 3.5rem; align-items: start; }
+.code-block {
+  background: #0e0e0e; border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px; overflow: hidden;
+}
+.code-header {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.02);
+}
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.dot-r { background: #ff5f57; }
+.dot-y { background: #febc2e; }
+.dot-g { background: #28c840; }
+.code-filename { font-size: 0.75rem; color: var(--gray); margin-left: 0.5rem; font-family: monospace; }
+.code-block pre {
+  padding: 1.5rem; font-family: 'Courier New', monospace;
+  font-size: 0.78rem; line-height: 1.7; color: #ccc;
+  overflow-x: auto; white-space: pre;
+}
+.code-block .kw { color: #c792ea; }
+.code-block .str { color: #c3e88d; }
+.code-block .attr { color: #82aaff; }
+.code-block .val { color: #f78c6c; }
+.code-block .cm { color: #546e7a; font-style: italic; }
+.setup-steps-list { list-style: none; }
+.setup-steps-list li {
+  display: flex; gap: 1rem; padding: 1.25rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.setup-steps-list li:last-child { border-bottom: none; }
+.setup-step-n {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  background: rgba(200,255,62,0.1); border: 1px solid rgba(200,255,62,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-size: 0.75rem; font-weight: 700; color: var(--accent);
+}
+.setup-step-text strong { display: block; font-family: 'Syne', sans-serif; font-size: 0.9rem; margin-bottom: 0.25rem; }
+.setup-step-text span { font-size: 0.825rem; color: var(--gray); line-height: 1.6; }
+code {
+  font-family: monospace; background: rgba(200,255,62,0.1);
+  color: var(--accent); padding: 0.1em 0.4em; border-radius: 4px; font-size: 0.8em;
+}
+
+/* STACK */
+#stack { border-top: 1px solid rgba(255,255,255,0.06); }
+.stack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px; margin-top: 3rem; border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; overflow: hidden; }
+.stack-item { padding: 2rem; background: var(--card-bg); transition: background 0.2s; }
+.stack-item:hover { background: #161616; }
+.stack-logo { font-size: 1.75rem; margin-bottom: 0.75rem; }
+.stack-name { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; }
+.stack-role { font-size: 0.8rem; color: var(--gray); line-height: 1.5; }
+
+/* FOOTER */
+footer {
+  padding: 3rem; border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: gap;
+  gap: 1rem;
+}
+.footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; }
+.footer-logo span { color: var(--accent); }
+.footer-note { font-size: 0.8rem; color: var(--gray); }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  nav { padding: 1rem 1.25rem; }
+  .nav-links { display: none; }
+  section { padding: 4rem 1.25rem; }
+  .hero { padding: 7rem 1.25rem 4rem; }
+  .hero-stats { gap: 1.5rem; flex-wrap: wrap; }
+  .demo-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+  .setup-grid { grid-template-columns: 1fr; }
+  footer { flex-direction: column; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">AR<span>Studio</span></div>
+  <div class="nav-links">
+    <a href="#como-funciona">Cómo funciona</a>
+    <a href="#demo">Demo</a>
+    <a href="#setup">Setup</a>
+    <a href="#stack">Stack</a>
+  </div>
+  <a href="ar-experience.html" class="nav-cta">Abrir AR →</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="hero-tag">Realidad Aumentada · MVP Universitario</div>
+    <h1>Tus productos,<br>en el <em>mundo real</em></h1>
+    <p class="hero-sub">
+      Plataforma WebAR que permite a clientes visualizar productos 3D en su espacio real, 
+      directo desde el navegador. Sin apps. Sin instalaciones.
+    </p>
+    <div class="hero-actions">
+      <a href="ar-experience.html" class="btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Probar experiencia AR
+      </a>
+      <a href="#como-funciona" class="btn-secondary">Ver cómo funciona</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">0<span>s</span></div>
+        <div class="stat-label">de instalación</div>
+      </div>
+      <div>
+        <div class="stat-num">98<span>%</span></div>
+        <div class="stat-label">precisión espacial</div>
+      </div>
+      <div>
+        <div class="stat-num">iOS<span>+</span>Android</div>
+        <div class="stat-label">cross-platform</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="como-funciona">
+  <div class="section-label">Proceso</div>
+  <h2>Tres pasos,<br>experiencia completa</h2>
+  <p class="section-sub">De un link a un producto flotando en tu habitación en menos de 10 segundos.</p>
+  <div class="steps-grid">
+    <div class="step-card">
+      <div class="step-num">01</div>
+      <div class="step-icon">📱</div>
+      <div class="step-title">Escaneá el QR</div>
+      <div class="step-desc">El cliente escanea el código QR o abre el link directo. No descarga ninguna app.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-icon">🎯</div>
+      <div class="step-num">02</div>
+      <div class="step-title">Apuntá al marcador</div>
+      <div class="step-desc">La cámara detecta el marcador impreso (hoja A4 o tarjeta). En tiendas físicas o enviado por email.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-icon">✨</div>
+      <div class="step-num">03</div>
+      <div class="step-title">El producto aparece</div>
+      <div class="step-desc">El modelo 3D se ancla al marcador con escala real. El usuario puede girar el celular para verlo desde todos los ángulos.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-icon">🛒</div>
+      <div class="step-num">04</div>
+      <div class="step-title">Acción de compra</div>
+      <div class="step-desc">Botón de compra superpuesto en la experiencia. Conversión directa desde la visualización AR.</div>
+    </div>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="demo-inner">
+    <div class="demo-visual">
+      <div class="demo-icon">📦</div>
+      <div class="demo-label">Modelo 3D en vivo</div>
+      <div class="demo-sub-label">Abrí ar-experience.html en tu celular</div>
+    </div>
+    <div class="demo-content">
+      <div class="section-label">Demo interactiva</div>
+      <h2>Probalo ahora mismo</h2>
+      <p>
+        Imprimí el marcador Hiro (incluido en este repo como <code>marker.pdf</code>), 
+        abrí la experiencia en tu celular y apuntá la cámara. El producto 3D aparece anclado en el espacio.
+        Funciona en Chrome para Android y Safari para iOS 12+.
+      </p>
+      <a href="ar-experience.html" class="demo-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        Abrir experiencia AR
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="setup">
+  <div class="section-label">Código</div>
+  <h2>Setup en 5 minutos</h2>
+  <p class="section-sub">Todo el stack corre en el navegador. Solo necesitás HTTPS para acceder a la cámara.</p>
+  <div class="setup-grid">
+    <div class="code-block">
+      <div class="code-header">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <span class="code-filename">ar-experience.html (core)</span>
+      </div>
+      <pre><span class="cm">&lt;!-- 1. Cargar librerías --&gt;</span>
+<span class="kw">&lt;script</span> <span class="attr">src</span>=<span class="str">"aframe.min.js"</span><span class="kw">&gt;&lt;/script&gt;</span>
+<span class="kw">&lt;script</span> <span class="attr">src</span>=<span class="str">"ar.min.js"</span><span class="kw">&gt;&lt;/script&gt;</span>
+
+<span class="cm">&lt;!-- 2. Escena AR --&gt;</span>
+<span class="kw">&lt;a-scene</span>
+  <span class="attr">embedded</span>
+  <span class="attr">arjs</span>=<span class="str">"trackingMethod: best;"</span><span class="kw">&gt;</span>
+
+  <span class="cm">&lt;!-- 3. Modelo 3D sobre el marcador --&gt;</span>
+  <span class="kw">&lt;a-marker</span> <span class="attr">preset</span>=<span class="str">"hiro"</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;a-entity</span>
+      <span class="attr">gltf-model</span>=<span class="str">"#mi-producto"</span>
+      <span class="attr">scale</span>=<span class="str">"0.5 0.5 0.5"</span>
+      <span class="attr">position</span>=<span class="str">"0 0.5 0"</span>
+      <span class="attr">animation</span>=<span class="str">"property: rotation;
+        to: 0 360 0; loop: true;
+        dur: 6000"</span><span class="kw">&gt;
+    &lt;/a-entity&gt;</span>
+  <span class="kw">&lt;/a-marker&gt;</span>
+
+  <span class="kw">&lt;a-entity</span> <span class="attr">camera</span><span class="kw">&gt;&lt;/a-entity&gt;</span>
+<span class="kw">&lt;/a-scene&gt;</span></pre>
+    </div>
+    <ul class="setup-steps-list">
+      <li>
+        <div class="setup-step-n">1</div>
+        <div class="setup-step-text">
+          <strong>Cloná el repo</strong>
+          <span>Todos los archivos ya están incluidos. No hay dependencias de Node.js ni build process.</span>
+        </div>
+      </li>
+      <li>
+        <div class="setup-step-n">2</div>
+        <div class="setup-step-text">
+          <strong>Subí a GitHub Pages</strong>
+          <span>Settings → Pages → Deploy from branch <code>main</code>. GitHub genera HTTPS automáticamente (obligatorio para acceder a la cámara).</span>
+        </div>
+      </li>
+      <li>
+        <div class="setup-step-n">3</div>
+        <div class="setup-step-text">
+          <strong>Imprimí el marcador Hiro</strong>
+          <span>Abrí <code>marker.html</code> en el repo y hacé print. O descargá el PNG para enviarlo por WhatsApp.</span>
+        </div>
+      </li>
+      <li>
+        <div class="setup-step-n">4</div>
+        <div class="setup-step-text">
+          <strong>Cambiá el modelo 3D</strong>
+          <span>Reemplazá <code>modelo.glb</code> con tu propio archivo GLTF/GLB. Podés descargar modelos gratis de <code>sketchfab.com</code> o <code>poly.pizza</code>.</span>
+        </div>
+      </li>
+      <li>
+        <div class="setup-step-n">5</div>
+        <div class="setup-step-text">
+          <strong>Probá en el celular</strong>
+          <span>Chrome en Android o Safari iOS 12+. Apuntá la cámara al marcador impreso.</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section id="stack">
+  <div class="section-label">Tecnología</div>
+  <h2>Stack 100% open source</h2>
+  <p class="section-sub">Cero licencias. Cero backend. Corre directo en el navegador del cliente.</p>
+  <div class="stack-grid">
+    <div class="stack-item">
+      <div class="stack-logo">🅰</div>
+      <div class="stack-name">A-Frame</div>
+      <div class="stack-role">Framework WebXR declarativo. Escenas 3D con HTML tags.</div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-logo">📍</div>
+      <div class="stack-name">AR.js</div>
+      <div class="stack-role">Tracking de marcadores en el navegador. Usa ARToolKit compilado a WASM.</div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-logo">🎲</div>
+      <div class="stack-name">Three.js</div>
+      <div class="stack-role">Motor 3D WebGL subyacente. Rendering de modelos GLTF/GLB.</div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-logo">📦</div>
+      <div class="stack-name">GLTF / GLB</div>
+      <div class="stack-role">Formato 3D estándar. Modelos gratuitos en Sketchfab, Poly Pizza, Google Scans.</div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-logo">⚡</div>
+      <div class="stack-name">GitHub Pages</div>
+      <div class="stack-role">Hosting gratuito con HTTPS incluido. Deploy automático desde el repo.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>
+    <div class="footer-logo">AR<span>Studio</span></div>
+    <div class="footer-note" style="margin-top: 0.5rem;">MVP universitario · Stack: A-Frame + AR.js + Three.js</div>
+  </div>
+  <div class="footer-note">
+    Funciona en Chrome Android · Safari iOS 12+ · Sin instalación
+  </div>
+</footer>
+
+</body>
+</html>
