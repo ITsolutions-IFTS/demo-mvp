@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guión hablado · 3 — Web AR / QR</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="coloquio-integrantes.html">← Guión por integrante</a> · <a href="presentacion.html">Slides</a></div>
+  <h1>Guión hablado — 3 · modelar-web · Visor AR + QR
+    <small>Integrante 3 · 5 min · model-viewer · three.js · zxing</small>
+  </h1>
+  <p class="lead">La experiencia que ve el usuario final: del QR al modelo 3D en AR, sin instalar nada.</p>
+
+  <h3 id="flujo">① El flujo público <span class="muted" style="font-size:.8rem">(módulos)</span></h3>
+  <div class="spoken">
+    "La parte pública es lo que ve el usuario final, y son cuatro pantallas, separadas del admin: la <span class="q">landing</span> de marketing, el <span class="q">catálogo</span> de modelos, la pantalla de <span class="q">escaneo de QR</span>, y el <span class="q">visor de AR</span>, que es la ruta <span class="q">/ar/</span> con el id del modelo. El visor es 'standalone': cuando entrás por un QR, ocultamos la navegación de marketing para que la experiencia sea limpia."
+  </div>
+  <pre><code><span class="cm">// rutas públicas (App.tsx)</span>
+/  (landing)   /catalogo   /scan   /ar/:uid  (visor AR)</code></pre>
+
+  <h3 id="visor">② El visor AR <span class="muted" style="font-size:.8rem">(decisiones / código)</span></h3>
+  <div class="spoken">
+    "El visor lo construimos sobre <span class="q">@google/model-viewer</span>, un web component de Google, con three.js por debajo. Lo bueno es que resuelve la AR en las tres plataformas con un solo componente: usa <span class="q">Scene Viewer</span> en Android, <span class="q">WebXR</span> donde está disponible, y <span class="q">Quick Look</span> en iOS — eso se configura en el atributo <span class="q">ar-modes</span>. El usuario ve el modelo girando, lo rota con el dedo, y tiene un botón 'Ver en tu espacio' que abre la cámara y lo proyecta sobre el piso real. Además detectamos si el dispositivo soporta WebXR y, si lo soporta, ofrecemos un modo de <span class="q">AR precisa</span> renderizado directo con three.js."
+  </div>
+  <pre><code>&lt;<span class="ty">model-viewer</span> src={modelUrl} ar
+  ar-modes=<span class="st">"scene-viewer webxr quick-look"</span>
+  camera-controls auto-rotate&gt;
+  &lt;button slot=<span class="st">"ar-button"</span>&gt;Ver en tu espacio&lt;/button&gt;
+&lt;/<span class="ty">model-viewer</span>&gt;</code></pre>
+
+  <h3 id="qr">③ El escáner de QR</h3>
+  <div class="spoken">
+    "El escáner usa la librería <span class="q">zxing</span>, que lee el stream de la cámara. Hay un hook, <span class="q">useQRScanner</span>, que arranca la cámara y maneja una pequeña máquina de estados: inicializando, escaneando, detectado, error. Un detalle fino: cuando no hay ningún QR en el cuadro, zxing tira una excepción <span class="q">NotFoundException</span> — eso es lo normal, así que la ignoramos y no la tratamos como error. Cuando detecta un QR, pasamos el texto a <span class="q">parseScanToModelId</span>, que extrae el id del modelo. Esa función es flexible: acepta un id directo, una URL con hash route, con path, o con query param — porque el QR puede venir en distintos formatos."
+  </div>
+  <pre><code><span class="cm">// parseScanToModelId acepta:</span>
+<span class="st">"ECO-001"</span>            <span class="cm">// id directo</span>
+<span class="st">".../#/ar/abc123"</span>     <span class="cm">// hash route</span>
+<span class="st">".../ar/abc123"</span>       <span class="cm">// path</span>
+<span class="st">"...?id=abc123"</span>       <span class="cm">// query param</span></code></pre>
+
+  <h3 id="analytics">④ Analytics <span class="muted" style="font-size:.8rem">(módulos)</span></h3>
+  <div class="spoken">
+    "Para las métricas, cada vez que el usuario ve un modelo, activa la AR o hace click en el call-to-action, mandamos un evento. Usamos un patrón <span class="q">fire-and-forget</span>: la función <span class="q">trackEvent</span> dispara un POST a <span class="q">/api/events</span> y nunca propaga el error — si falla, no queremos romper la experiencia. Usamos la opción <span class="q">keepalive</span> del fetch, que permite que la request sobreviva aunque el usuario navegue a otra página, por ejemplo al abrir el CTA. Es un endpoint público, así que no manda token. Y si el modelo es del catálogo y no tiene campaña asociada, simplemente no trackeamos, sin romper nada."
+  </div>
+
+  <h3 id="decisiones">⑤ Decisiones de diseño</h3>
+  <div class="spoken">
+    "Dos decisiones clave: hacer la AR <span class="q">en el navegador</span> con model-viewer, en vez de pedir instalar una app — eso es <span class="q">cero fricción</span>, justo lo que necesitás para que alguien escanee un QR en la calle y vea el producto. Y usar <span class="q">HashRouter</span>, que permite desplegar el front como sitio estático en Vercel sin configurar redirecciones del lado del servidor."
+  </div>
+
+  <h3 id="pruebas">⑥ Pruebas <span class="muted" style="font-size:.8rem">(pruebas)</span></h3>
+  <div class="spoken">
+    "La lógica del parseo del QR está cubierta con <span class="q">vitest</span>. Probamos los siete casos: que extraiga el id de una URL con hash, con path, con query param, que devuelva el id tal cual si ya es directo, que devuelva null si está vacío o es inválido, y un caso real con un UID de Sketchfab. Es la pieza más crítica del escaneo, así que la blindamos con tests."
+  </div>
+
+  <div class="note say"><b>Cierre:</b> "Yo trabajé en ___ (p. ej. el visor AR y el escáner de QR)."</div>
+  <p><a class="btn" href="guion-2-web-admin.html">← Web Admin</a> <a class="btn" href="guion-4-api.html">Siguiente: API Gateway →</a></p>
+  <p class="foot">modelAR · Guión hablado 3/5</p>
+</div>
+</body>
+</html>

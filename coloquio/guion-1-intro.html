@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guión hablado · 1 — Intro + arquitectura</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="coloquio-integrantes.html">← Guión por integrante</a> · <a href="presentacion.html">Slides</a></div>
+  <h1>Guión hablado — 1 · Intro + arquitectura general
+    <small>Integrante 1 · ~4-5 min · texto orientativo, ajustá a tu estilo</small>
+  </h1>
+
+  <h3 id="problema">① El problema <span class="muted" style="font-size:.8rem">(decisiones de diseño)</span></h3>
+  <div class="spoken">
+    "Hoy, si una marca quiere mostrar sus productos en 3D o realidad aumentada, necesita desarrollar una app nativa o algo a medida — es caro y lento. Y aunque lo logre, no tiene una forma simple de <span class="q">publicar</span> ese modelo y compartirlo con sus clientes, ni de <span class="q">medir</span> si la gente realmente lo usa. Ese es el problema que detectamos."
+  </div>
+
+  <h3 id="solucion">② La solución — modelAR</h3>
+  <div class="spoken">
+    "modelAR es una plataforma web <span class="q">multi-tenant</span>. El cliente entra, elige un modelo 3D de un catálogo —que combina la API de Sketchfab con modelos que nosotros curamos— y arma una <span class="q">campaña</span>. La plataforma le genera automáticamente un visor de realidad aumentada con un <span class="q">código QR</span>: el usuario final escanea el QR desde el celular y ve el producto en AR directamente en el navegador, <span class="q">sin instalar ninguna app</span>. Y todo lo que pasa ahí —vistas, activaciones de AR, clicks en el botón— se mide con analíticas. Multi-tenant significa que cada cliente y cada organización tienen sus datos completamente aislados."
+  </div>
+  <p class="muted">Sectores reales soportados: <span class="pill">ecommerce</span><span class="pill">turismo</span><span class="pill">educacion</span><span class="pill">inmobiliario</span><span class="pill">museo</span></p>
+
+  <h3 id="arquitectura">③ La arquitectura <span class="muted" style="font-size:.8rem">(arquitectura)</span></h3>
+  <div class="flow">
+    <div class="node web"><div class="t">modelar-web</div><div class="s">React · Vercel</div></div>
+    <div class="arrow"><span class="big">→</span></div>
+    <div class="node api"><div class="t">modelar-api</div><div class="s">Gateway · Render</div></div>
+    <div class="arrow"><span class="big">→</span></div>
+    <div class="node core"><div class="t">modelar-core</div><div class="s">NestJS · Render</div></div>
+    <div class="arrow"><span class="big">→</span></div>
+    <div class="node db"><div class="t">Neon</div><div class="s">PostgreSQL</div></div>
+  </div>
+  <div class="spoken">
+    "Por debajo son <span class="q">tres servicios desacoplados</span> que se comunican por HTTP/JSON. El frontend, <span class="q">modelar-web</span>, en React. Un gateway, <span class="q">modelar-api</span>, que es la puerta de entrada. Y <span class="q">modelar-core</span>, en NestJS, que tiene toda la lógica de negocio y es el único que habla con la base de datos, que es PostgreSQL en Neon. Además, core consume la API externa de Sketchfab para los modelos 3D. Algo importante: el navegador <span class="q">nunca</span> habla directo con core ni con la base — siempre pasa por el gateway."
+  </div>
+
+  <h3 id="decision">④ La decisión de fondo</h3>
+  <div class="spoken">
+    "La decisión central de la arquitectura fue separar en tres servicios con responsabilidades bien distintas: <span class="q">presentación</span> en el front, <span class="q">borde y seguridad</span> en el gateway, y <span class="q">lógica más datos</span> en core. Cada uno se desarrolla, despliega y escala por separado. El detalle de por qué separamos el gateway de core lo explica [nombre] en su parte."
+  </div>
+
+  <h3 id="deploy">⑤ El despliegue</h3>
+  <div class="spoken">
+    "Para el despliegue usamos la plataforma que mejor encaja con cada pieza: el <span class="q">frontend en Vercel</span>, ideal para apps de React; <span class="q">api y core en Render</span>; y la base de datos en <span class="q">Neon</span>, un Postgres serverless."
+  </div>
+
+  <div class="note say"><b>Cierre:</b> "Yo me encargué de ___. Le paso a ___, que explica el frontend."</div>
+  <p><a class="btn" href="guion-2-web-admin.html">Siguiente: Web Admin →</a></p>
+  <p class="foot">modelAR · Guión hablado 1/5</p>
+</div>
+</body>
+</html>

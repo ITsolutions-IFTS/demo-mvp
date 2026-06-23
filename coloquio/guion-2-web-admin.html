@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guión hablado · 2 — Web Admin</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="coloquio-integrantes.html">← Guión por integrante</a> · <a href="presentacion.html">Slides</a></div>
+  <h1>Guión hablado — 2 · modelar-web · Panel admin
+    <small>Integrante 2 · 5 min · React 19 + Vite · gestión de campañas</small>
+  </h1>
+  <p class="lead">El frontend que usan los clientes para crear y administrar sus campañas.</p>
+
+  <h3 id="stack">① El stack <span class="muted" style="font-size:.8rem">(arquitectura)</span></h3>
+  <div class="spoken">
+    "El front está hecho con <span class="q">React 19 y Vite</span>, todo en TypeScript. Para el ruteo usamos react-router en modo <span class="q">HashRouter</span>. Y para el estado global no usamos Redux ni librerías externas: usamos el <span class="q">Context API</span> de React. Tenemos cuatro contextos principales —autenticación, organizaciones, campañas y colecciones— más dos de UI, para los toasts y los diálogos de confirmación. Cada contexto encapsula su estado y las llamadas a la API de su recurso."
+  </div>
+  <p class="muted">En <code>App.tsx</code> los providers se anidan: <code>Auth → Organizations → Campaigns → Collections</code>, envueltos por <code>Toast</code> y <code>Confirm</code>.</p>
+
+  <h3 id="pantallas">② Pantallas / módulos <span class="muted" style="font-size:.8rem">(módulos)</span></h3>
+  <div class="spoken">
+    "El panel tiene varias pantallas, que son las rutas bajo <span class="q">/admin</span>: el login, organizaciones, el listado de campañas, el <span class="q">formulario para crear o editar</span> una campaña, la pantalla que genera el <span class="q">QR</span> de cada campaña, las colecciones, y un <span class="q">dashboard de métricas</span>. Todas las rutas del admin están protegidas: si no hay sesión, el componente <span class="q">ProtectedRoute</span> te manda al login."
+  </div>
+  <pre><code><span class="cm">// rutas del admin (App.tsx)</span>
+/admin/login   /admin/organizaciones   /admin/campanas
+/admin/campanas/nueva   /admin/campanas/:id/qr
+/admin/colecciones   /admin/metricas   /admin/dashboard</code></pre>
+
+  <h3 id="api">③ Cómo consume la API <span class="muted" style="font-size:.8rem">(decisiones / código)</span></h3>
+  <div class="spoken">
+    "Toda la comunicación con el backend pasa por una sola capa, <span class="q">services/api.ts</span>. Ahí hay una función <span class="q">apiFetch</span> que envuelve el fetch nativo y centraliza tres cosas. Primero, agrega el <span class="q">token JWT</span> en el header Authorization como Bearer, leyéndolo de sessionStorage. Segundo, le pone un <span class="q">timeout de 10 segundos</span> con AbortController, así una request colgada no deja la UI esperando para siempre. Y tercero, maneja los errores de forma uniforme: si el backend devuelve un <span class="q">401</span> y nosotros habíamos mandado un token, interpretamos que la sesión expiró, limpiamos el token y disparamos un evento global; el contexto de auth escucha ese evento y <span class="q">desloguea automáticamente</span>. El login guarda el access token y el refresh token, y al recargar la página rehidrata la sesión llamando a <span class="q">/auth/me</span>."
+  </div>
+  <pre><code><span class="kw">if</span> (res.status === <span class="st">401</span> && token) {
+  clearToken(); clearRefreshToken();
+  window.<span class="fn">dispatchEvent</span>(<span class="kw">new</span> <span class="ty">Event</span>(UNAUTHORIZED_EVENT)); <span class="cm">// → auto-logout</span>
+  <span class="kw">throw new</span> <span class="ty">Error</span>(<span class="st">'Sesión expirada...'</span>);
+}</code></pre>
+
+  <h3 id="decisiones">④ Decisiones de diseño</h3>
+  <div class="spoken">
+    "Las decisiones del front: usar <span class="q">Context API en vez de Redux</span>, porque para el alcance era más simple y suficiente. Guardar el token en <span class="q">sessionStorage</span> en vez de localStorage, así la sesión se cierra al cerrar la pestaña, que es un poco más seguro. Rutas protegidas con <span class="q">ProtectedRoute</span>. Y soporte <span class="q">multi-tenant</span>: el usuario opera sobre su organización."
+  </div>
+
+  <h3 id="pruebas">⑤ Pruebas <span class="muted" style="font-size:.8rem">(pruebas)</span></h3>
+  <div class="spoken">
+    "Para testing usamos <span class="q">vitest</span> con Testing Library. Tenemos tests del cliente de API, de las utilidades de <span class="q">storage</span>, y de las funciones que calculan estadísticas de campañas. Son tests unitarios que corren sobre jsdom, sin navegador real."
+  </div>
+
+  <h3 id="fragmento">⑥ Fragmento representativo <span class="muted" style="font-size:.8rem">(código)</span></h3>
+  <div class="spoken">
+    "Un fragmento representativo es cómo el contexto de campañas crea una y actualiza el estado: llama a la API y, cuando vuelve la campaña creada, la <span class="q">agrega al principio de la lista</span> en memoria, así la UI se actualiza al instante sin tener que volver a pedir todo."
+  </div>
+  <pre><code><span class="kw">const</span> <span class="fn">addCampaign</span> = <span class="kw">async</span> (data) => {
+  <span class="kw">const</span> created = <span class="kw">await</span> <span class="fn">apiCreateCampaign</span>(data);
+  <span class="fn">setCampaigns</span>(prev => [created, ...prev]); <span class="cm">// aparece al instante</span>
+  <span class="kw">return</span> created;
+};</code></pre>
+
+  <div class="note say"><b>Cierre:</b> "Yo trabajé en ___ (p. ej. el módulo de campañas y el cliente de API)."</div>
+  <p><a class="btn" href="guion-1-intro.html">← Intro</a> <a class="btn" href="guion-3-web-ar.html">Siguiente: Web AR/QR →</a></p>
+  <p class="foot">modelAR · Guión hablado 2/5</p>
+</div>
+</body>
+</html>

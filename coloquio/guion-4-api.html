@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guión hablado · 4 — API Gateway (BFF)</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="coloquio-integrantes.html">← Guión por integrante</a> · <a href="presentacion.html">Slides</a></div>
+  <h1>Guión hablado — 4 · modelar-api · Gateway (BFF)
+    <small>Integrante 4 · 5 min · Express · el borde público</small>
+  </h1>
+  <p class="lead">El gateway: por qué existe y cómo reenvía el tráfico de forma segura.</p>
+
+  <h3 id="que-es">① Qué es <span class="muted" style="font-size:.8rem">(arquitectura)</span></h3>
+  <div class="spoken">
+    "modelar-api es un gateway <span class="q">muy delgado</span>, en Express. Son literalmente tres archivos: la configuración, el arranque y el reenvío. <span class="q">No tiene lógica de negocio, no toca la base de datos, y ni siquiera valida el JWT</span> — de eso se encarga core. Su único trabajo es ser la puerta de entrada pública del sistema."
+  </div>
+
+  <h3 id="bff">② El concepto: Backend-for-Frontend (BFF) <span class="muted" style="font-size:.8rem">(decisiones)</span></h3>
+  <div class="spoken">
+    "Lo pensamos como un patrón <span class="q">Backend-for-Frontend</span>, o BFF. La idea del BFF es tener una capa de backend <span class="q">dedicada al frontend</span>, que se ubica entre el cliente y los servicios de negocio, y que es el <span class="q">único punto de entrada</span> para el front. Le da al frontend exactamente lo que necesita y centraliza ahí las cosas de borde —seguridad, CORS, tracing— sin meterlas en la lógica de negocio. Hoy reenvía casi uno a uno, pero esa capa es justamente la <span class="q">costura</span> donde, el día de mañana, podríamos adaptar respuestas para distintos frontends —el panel admin y el visor AR público— sin tocar core."
+  </div>
+
+  <h3 id="porque">③ Por qué existe separado de core</h3>
+  <div class="spoken">
+    "¿Por qué no un solo backend? Cuatro razones. <span class="q">Seguridad por aislamiento</span>: core queda como servicio interno y el gateway es lo único expuesto, con una lista blanca de rutas. <span class="q">Separación de responsabilidades</span>: las cosas de borde viven en un solo lugar. <span class="q">Deploy independiente</span>: cada servicio se despliega y escala por separado. Y la <span class="q">costura para múltiples frontends</span> que mencioné. Para ser honestos: para un MVP de un solo cliente, un único backend sería más simple — esto es una <span class="q">inversión consciente</span> en seguridad y en que el sistema crezca."
+  </div>
+
+  <h3 id="como">④ Cómo funciona <span class="muted" style="font-size:.8rem">(módulos / código)</span></h3>
+  <div class="spoken">
+    "Cuando llega una request, la función <span class="q">forward</span> arma la URL hacia core y reenvía el método, el body y una <span class="q">lista blanca de headers</span>: el Authorization para que core valide el token, un <span class="q">x-request-id</span> para tracing distribuido, y la <span class="q">IP real</span> del cliente, que core usa para el rate-limit de los endpoints públicos. Le pone un <span class="q">timeout de 10 segundos</span>; si core no responde —por ejemplo si está arrancando—, en vez de colgarse devuelve un <span class="q">503 limpio</span>. Además, en el arranque aplicamos helmet y cors, limitamos el body, generamos el request-id si no viene, y tenemos una <span class="q">lista explícita de rutas</span>: lo que no esté en la lista devuelve un 404 sin llegar a core."
+  </div>
+
+  <h3 id="decisiones">⑤ Decisiones de diseño</h3>
+  <div class="spoken">
+    "Las decisiones: la <span class="q">whitelist de rutas</span> reduce la superficie de ataque. El <span class="q">forwarding de la IP real</span> es necesario porque, al pasar por el gateway, core vería la IP del gateway y no la del usuario — así el rate-limit por IP funciona bien. Y el <span class="q">x-request-id</span> permite seguir una misma request a través de los dos servicios en los logs."
+  </div>
+
+  <h3 id="fragmento">⑥ Fragmento representativo <span class="muted" style="font-size:.8rem">(código)</span></h3>
+  <pre><code><span class="cm">// forward.ts — reenvío al core con timeout</span>
+<span class="kw">const</span> upstream = <span class="kw">await</span> <span class="fn">fetch</span>(url.toString(), {
+  method: req.method,
+  headers,                 <span class="cm">// authorization, x-request-id, x-forwarded-for...</span>
+  body: hasBody ? <span class="ty">JSON</span>.<span class="fn">stringify</span>(req.body) : undefined,
+  signal: controller.signal, <span class="cm">// abort a los 10s → 503</span>
+});</code></pre>
+
+  <div class="note say"><b>Cierre:</b> "Yo trabajé en ___ (el gateway, el forwarding y la seguridad de borde)."</div>
+  <p><a class="btn" href="guion-3-web-ar.html">← Web AR</a> <a class="btn go" href="guion-5-core.html">Siguiente: Core + demo →</a></p>
+  <p class="foot">modelAR · Guión hablado 4/5</p>
+</div>
+</body>
+</html>

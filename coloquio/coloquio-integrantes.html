@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>modelAR — Guión por integrante</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="index.html">← Inicio</a> · <a href="presentacion.html">Presentación (slides)</a></div>
+
+  <h1>modelAR — Guión por integrante
+    <small>Qué explica y qué dice cada uno · cada punto enlaza a su <b>guión hablado</b> 🔊</small>
+  </h1>
+  <p class="lead">Resumen accionable de cada segmento. Para el <b>texto hablado y los detalles técnicos</b> de cada punto, seguí el link 🔊 — abre el guión detallado, fiel al código.</p>
+
+  <!-- COBERTURA -->
+  <h2><span class="n">★</span>Cobertura de la consigna</h2>
+  <table>
+    <tr><th>Punto de la consigna</th><th>1·Intro</th><th>2·Web Adm</th><th>3·Web AR</th><th>4·API</th><th>5·Core (vos)</th></tr>
+    <tr><td>Arquitectura / estructura</td><td class="yes">✓</td><td class="yes">✓</td><td class="no">·</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+    <tr><td>Módulos principales</td><td class="no">·</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+    <tr><td>Base de datos</td><td class="no">·</td><td class="no">·</td><td class="no">·</td><td class="no">·</td><td class="yes">✓</td></tr>
+    <tr><td>Decisiones de diseño</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+    <tr><td>Pruebas unit. e integración</td><td class="no">·</td><td class="yes">✓</td><td class="yes">✓</td><td class="no">·</td><td class="yes">✓</td></tr>
+    <tr><td>Fragmentos de código</td><td class="no">·</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+    <tr><td>Aporte individual</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+  </table>
+  <p class="muted" style="font-size:.9rem">La <b>base de datos</b> la cubre solo Core — es el único servicio que la toca. Que web/api no accedan a la DB es, en sí, una decisión de diseño.</p>
+
+  <!-- INTEGRANTE 1 -->
+  <div class="card">
+    <div class="chd"><span class="num">1</span><div><div class="ti">Intro + arquitectura general</div><div class="sub">visión global</div></div>
+      <span class="chip who" style="margin-left:auto">Integrante 1</span><span class="chip min">~4-5 min</span></div>
+    <div class="cbody">
+      <h4 class="say" style="color:var(--warn)">Qué decir</h4>
+      <ul>
+        <li><b>Problema</b>: mostrar productos en 3D/AR es difícil y caro. <a class="say-link" href="guion-1-intro.html#problema">🔊 hablado</a></li>
+        <li><b>Solución</b>: modelAR, campañas 3D/AR multi-tenant con QR y analíticas. <a class="say-link" href="guion-1-intro.html#solucion">🔊 hablado</a></li>
+        <li><b>Arquitectura</b>: web → api → core → Neon + Sketchfab. <a class="say-link" href="guion-1-intro.html#arquitectura">🔊 hablado</a></li>
+        <li><b>Decisión</b>: 3 servicios con responsabilidades separadas. <a class="say-link" href="guion-1-intro.html#decision">🔊 hablado</a></li>
+        <li><b>Deploy</b>: web en Vercel; api y core en Render; base en Neon. <a class="say-link" href="guion-1-intro.html#deploy">🔊 hablado</a></li>
+      </ul>
+      <div class="tags"><span class="tag on">Arquitectura</span><span class="tag on">Decisiones de diseño</span></div>
+      <div class="screen">📺 Diagrama del sistema + la app desplegada.</div>
+      <p><a class="btn" href="guion-1-intro.html">Ver guión hablado completo →</a></p>
+    </div>
+  </div>
+
+  <!-- INTEGRANTE 2 -->
+  <div class="card">
+    <div class="chd"><span class="num">2</span><div><div class="ti">modelar-web — Panel de administración</div><div class="sub">React 19 + Vite · gestión</div></div>
+      <span class="chip who" style="margin-left:auto">Integrante 2</span><span class="chip min">5 min</span></div>
+    <div class="cbody">
+      <h4 class="say" style="color:var(--warn)">Qué decir</h4>
+      <ul>
+        <li><b>Stack</b>: React 19 + Vite + TS, HashRouter, Context API (4 providers). <a class="say-link" href="guion-2-web-admin.html#stack">🔊 hablado</a></li>
+        <li><b>Pantallas/módulos</b>: login, organizaciones, campañas, QR, colecciones, métricas. <a class="say-link" href="guion-2-web-admin.html#pantallas">🔊 hablado</a></li>
+        <li><b>Consumo de API</b>: <code>apiFetch</code> con JWT Bearer, timeout y auto-logout en 401. <a class="say-link" href="guion-2-web-admin.html#api">🔊 hablado</a></li>
+        <li><b>Decisiones</b>: Context vs Redux, sessionStorage, ProtectedRoute, multi-tenant. <a class="say-link" href="guion-2-web-admin.html#decisiones">🔊 hablado</a></li>
+        <li><b>Pruebas</b>: vitest + Testing Library (API, storage, stats). <a class="say-link" href="guion-2-web-admin.html#pruebas">🔊 hablado</a></li>
+        <li><b>Fragmento</b>: <code>apiFetch</code> / <code>CampaignsContext</code>. <a class="say-link" href="guion-2-web-admin.html#fragmento">🔊 hablado</a></li>
+      </ul>
+      <div class="tags"><span class="tag on">Arquitectura</span><span class="tag on">Módulos</span><span class="tag on">Decisiones</span><span class="tag on">Pruebas</span><span class="tag on">Código</span></div>
+      <div class="screen">📺 El panel admin andando + <code>services/api.ts</code>.</div>
+      <p><a class="btn" href="guion-2-web-admin.html">Ver guión hablado completo →</a></p>
+    </div>
+  </div>
+
+  <!-- INTEGRANTE 3 -->
+  <div class="card">
+    <div class="chd"><span class="num">3</span><div><div class="ti">modelar-web — Experiencia pública + AR + QR</div><div class="sub">model-viewer · three.js · zxing</div></div>
+      <span class="chip who" style="margin-left:auto">Integrante 3</span><span class="chip min">5 min</span></div>
+    <div class="cbody">
+      <h4 class="say" style="color:var(--warn)">Qué decir</h4>
+      <ul>
+        <li><b>Flujo público</b>: Landing → Catálogo → Scan → Visor AR. <a class="say-link" href="guion-3-web-ar.html#flujo">🔊 hablado</a></li>
+        <li><b>Visor AR</b>: model-viewer + three.js, AR en el navegador. <a class="say-link" href="guion-3-web-ar.html#visor">🔊 hablado</a></li>
+        <li><b>Escáner QR</b>: zxing + <code>parseScanToModelId</code>. <a class="say-link" href="guion-3-web-ar.html#qr">🔊 hablado</a></li>
+        <li><b>Analytics</b>: <code>trackEvent</code> fire-and-forget a <code>/api/events</code>. <a class="say-link" href="guion-3-web-ar.html#analytics">🔊 hablado</a></li>
+        <li><b>Decisiones</b>: AR web sin app nativa, HashRouter. <a class="say-link" href="guion-3-web-ar.html#decisiones">🔊 hablado</a></li>
+        <li><b>Pruebas</b>: <code>parseScanToModelId.test</code> (7 casos). <a class="say-link" href="guion-3-web-ar.html#pruebas">🔊 hablado</a></li>
+      </ul>
+      <div class="tags"><span class="tag on">Módulos</span><span class="tag on">Decisiones</span><span class="tag on">Pruebas</span><span class="tag on">Código</span></div>
+      <div class="screen">📺 Escanear un QR en vivo y mostrar el modelo en 3D/AR.</div>
+      <p><a class="btn" href="guion-3-web-ar.html">Ver guión hablado completo →</a></p>
+    </div>
+  </div>
+
+  <!-- INTEGRANTE 4 -->
+  <div class="card">
+    <div class="chd"><span class="num">4</span><div><div class="ti">modelar-api — API Gateway (BFF)</div><div class="sub">Express · borde público</div></div>
+      <span class="chip who" style="margin-left:auto">Integrante 4</span><span class="chip min">5 min</span></div>
+    <div class="cbody">
+      <h4 class="say" style="color:var(--warn)">Qué decir</h4>
+      <ul>
+        <li><b>Qué es</b>: gateway delgado en Express (3 archivos), sin lógica ni DB. <a class="say-link" href="guion-4-api.html#que-es">🔊 hablado</a></li>
+        <li><b>BFF</b>: lo pensamos como un <b>Backend-for-Frontend</b>. <a class="say-link" href="guion-4-api.html#bff">🔊 hablado</a></li>
+        <li><b>Por qué existe</b>: seguridad, separación, deploy y multi-frontend. <a class="say-link" href="guion-4-api.html#porque">🔊 hablado</a></li>
+        <li><b>Cómo funciona</b>: forward de headers, whitelist, timeout → 503. <a class="say-link" href="guion-4-api.html#como">🔊 hablado</a></li>
+        <li><b>Decisiones</b>: whitelist, IP para rate-limit, request-id. <a class="say-link" href="guion-4-api.html#decisiones">🔊 hablado</a></li>
+        <li><b>Fragmento</b>: <code>forward.ts</code>. <a class="say-link" href="guion-4-api.html#fragmento">🔊 hablado</a></li>
+      </ul>
+      <div class="tags"><span class="tag on">Arquitectura</span><span class="tag on">Módulos</span><span class="tag on">Decisiones</span><span class="tag on">Código</span></div>
+      <div class="screen">📺 <code>forward.ts</code> + rutas en <code>main.ts</code>.</div>
+      <p><a class="btn" href="guion-4-api.html">Ver guión hablado completo →</a></p>
+    </div>
+  </div>
+
+  <!-- INTEGRANTE 5 -->
+  <div class="card you">
+    <div class="chd"><span class="num">5</span><div><div class="ti">modelar-core + demo end-to-end + Neon</div><div class="sub">NestJS · lógica + datos · cierre</div></div>
+      <span class="chip you" style="margin-left:auto">VOS</span><span class="chip min">5 min</span></div>
+    <div class="cbody">
+      <h4 class="say" style="color:var(--warn)">Qué decir</h4>
+      <ul>
+        <li><b>Qué es core</b>: microservicio NestJS, lógica + único acceso a la DB. <a class="say-link" href="guion-5-core.html#que-es">🔊 hablado</a></li>
+        <li><b>Arquitectura</b>: Clean Architecture en 4 capas. <a class="say-link" href="guion-5-core.html#arquitectura">🔊 hablado</a></li>
+        <li><b>Módulos</b>: auth, organizations, campaigns, collections, catálogo, analytics. <a class="say-link" href="guion-5-core.html#modulos">🔊 hablado</a></li>
+        <li><b>Base de datos</b>: Postgres/Neon, 11 migraciones, multi-tenant, soft delete. <a class="say-link" href="guion-5-core.html#bd">🔊 hablado</a></li>
+        <li><b>Decisiones</b>: ports &amp; adapters, errores canónicos, deploy. <a class="say-link" href="guion-5-core.html#decisiones">🔊 hablado</a></li>
+        <li><b>Pruebas</b>: 31 unit + integración + e2e, 86%. <a class="say-link" href="guion-5-core.html#pruebas">🔊 hablado</a></li>
+        <li><b>Fragmento</b>: el merge Sketchfab + curados. <a class="say-link" href="guion-5-core.html#fragmento">🔊 hablado</a></li>
+        <li><b>DEMO</b>: login → crear campaña → verla en Neon. <a class="say-link" href="guion-5-core.html#demo">🔊 hablado</a></li>
+      </ul>
+      <div class="tags"><span class="tag on">Arquitectura</span><span class="tag on">Módulos</span><span class="tag on">Base de datos</span><span class="tag on">Decisiones</span><span class="tag on">Pruebas</span><span class="tag on">Código</span></div>
+      <div class="screen">📺 Repo de core, la app productiva (demo), y la consola de Neon.</div>
+      <p><a class="btn go" href="guion-5-core.html">Ver guión hablado completo →</a></p>
+    </div>
+  </div>
+
+  <div class="note"><b>Recordatorio:</b> todos con <b>cámara encendida</b>, cada uno cierra con su aporte individual, y ensayar el orden una vez de corrido. Entrega: <b>domingo 28/06 23:59</b>.</div>
+  <p class="foot">modelAR · ITSolutions AR — Guión por integrante</p>
+</div>
+</body>
+</html>
