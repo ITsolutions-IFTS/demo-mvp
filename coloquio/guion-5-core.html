@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guión hablado · 5 — Core + demo</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="coloquio-integrantes.html">← Guión por integrante</a> · <a href="presentacion.html">Slides</a></div>
+  <h1>Guión hablado — 5 · modelar-core + demo + Neon
+    <small>VOS · 5 min · NestJS · la demo es la columna vertebral</small>
+  </h1>
+  <p class="lead">El cerebro del sistema y el cierre integrador. En 5 min, <b>demostrá mientras explicás</b>: lo que no entre, una frase.</p>
+
+  <h3 id="que-es">① Qué es core</h3>
+  <div class="spoken">
+    "modelar-core es el <span class="q">cerebro</span> del sistema: un microservicio en NestJS y TypeScript que concentra <span class="q">toda la lógica de negocio</span>, y es el <span class="q">único servicio que accede a la base de datos</span>. No lo consume el navegador — lo consume el gateway, por HTTP/JSON."
+  </div>
+
+  <h3 id="arquitectura">② Arquitectura — Clean Architecture <span class="muted" style="font-size:.8rem">(arquitectura)</span></h3>
+  <div class="spoken">
+    "Lo organizamos con <span class="q">Clean Architecture</span>, en cuatro capas con dependencias en un solo sentido. En el centro, el <span class="q">dominio</span>: entidades, los <span class="q">puertos</span> —interfaces de repositorio— y los errores; es una capa pura, no importa nada de NestJS. Alrededor, la capa de <span class="q">aplicación</span>, con los casos de uso, un archivo por operación. Después la <span class="q">infraestructura</span>, los adapters: Sequelize, el cache, las APIs externas. Y los <span class="q">módulos</span>, que hacen el cableado con inyección de dependencias. La regla de oro: el <span class="q">dominio no depende de nadie</span> — eso nos deja testear la lógica sin levantar la base y cambiar de tecnología sin tocar las reglas."
+  </div>
+
+  <h3 id="modulos">③ Módulos principales <span class="muted" style="font-size:.8rem">(módulos)</span></h3>
+  <div class="spoken">
+    "El core está dividido por áreas de negocio, y en total son <span class="q">32 casos de uso</span>. Cada módulo se ocupa de una sola cosa:<br><br>
+    <span class="q">Autenticación</span> maneja el login con JWT —un access token y un refresh token— y es multi-tenant.<br>
+    <span class="q">Organizaciones</span> representa a cada cliente, que es un tenant del sistema.<br>
+    <span class="q">Campañas</span> es la entidad central: la campaña con su modelo 3D.<br>
+    <span class="q">Colecciones</span> permite agrupar campañas.<br>
+    <span class="q">Catálogo</span> combina la API de Sketchfab con los modelos que nosotros curamos.<br>
+    Y <span class="q">Analytics</span> procesa los eventos que llegan del visor y arma las métricas."
+  </div>
+
+  <h3 id="bd">④ Base de datos <span class="muted" style="font-size:.8rem">(base de datos)</span></h3>
+  <div class="spoken">
+    "La base es <span class="q">PostgreSQL en Neon</span>, con Sequelize. El esquema está versionado en <span class="q">11 migraciones</span> más seeders. Son siete tablas. Tres decisiones importantes: es <span class="q">multi-tenant</span>, así que toda query filtra por client_id u org_slug — un tenant nunca ve datos de otro. Usamos <span class="q">soft delete</span>: no borramos físico, marcamos una columna deleted_at. Y mapeamos <span class="q">snake_case</span> en la base a <span class="q">camelCase</span> en el código, dejando el modelo de Sequelize encerrado en infraestructura."
+  </div>
+  <p class="muted"><span class="pill">clients</span><span class="pill">organizations</span><span class="pill">campaigns</span><span class="pill">collections</span><span class="pill">analytics_events</span><span class="pill">curated_models</span><span class="pill">refresh_tokens</span></p>
+
+  <h3 id="decisiones">⑤ Decisiones de diseño</h3>
+  <div class="spoken">
+    "Las decisiones más importantes de core. <span class="q">Ports and adapters</span>: los casos de uso dependen de interfaces, no de la implementación concreta, y la inyección se resuelve con tokens. <span class="q">Errores canónicos</span>: una jerarquía de errores de dominio que un filtro global traduce a un formato de respuesta uniforme, con código, status y request-id. <span class="q">Cache y rate-limiting</span> con invalidación en cada cambio. Y una decisión de despliegue: como api y core están en el free tier de Render, que se duerme tras unos minutos, lo resolvimos con un <span class="q">health-check externo</span> que los mantiene despiertos."
+  </div>
+  <div class="note"><b>Sobre el cron:</b> solo <b>mencionarlo</b> (no mostrarlo). Encuádralo como "health-check externo", sin decir que corre en tu PC.</div>
+
+  <h3 id="pruebas">⑥ Pruebas <span class="muted" style="font-size:.8rem">(pruebas)</span></h3>
+  <div class="spoken">
+    "El testing fue un foco. Tres niveles. <span class="q">Unitarias</span>: 31, una por caso de uso, con los puertos mockeados — rápidas y sin base, aíslan la lógica. <span class="q">Integración</span>: corren los repositorios contra un <span class="q">Postgres real</span>; ahí validamos cosas que un mock no puede, como el soft delete, la paginación, que un tenant <span class="q">no vea las campañas de otro</span>, y las foreign keys. Y un test <span class="q">end-to-end</span> que levanta la app entera con supertest. La cobertura global es del <span class="q">86%</span>."
+  </div>
+  <pre><code><span class="cm"># sin base — listos para correr en vivo:</span>
+pnpm test:unit          <span class="cm"># 31 tests unitarios (mocks) → "31 passed"</span>
+pnpm test:cov:open      <span class="cm"># cobertura + abre el reporte HTML (86%)</span>
+
+<span class="cm"># integración (necesita Postgres arriba):</span>
+docker compose up -d    <span class="cm"># levanta Postgres (5433)</span>
+pnpm test:integration   <span class="cm"># repos contra Postgres real</span></code></pre>
+  <div class="note"><b>Qué mostrar:</b> corré <code>pnpm test:unit</code> en vivo (verde, sin setup) y abrí el reporte de cobertura. Opcional pero potente: abrí <code>campaign.sequelize.repository.integration-spec.ts</code> y mostrá los <b>nombres</b> de los tests — se leen como garantías: <i>"does not leak campaigns of other clients"</i>, <i>"findById returns null after softDelete"</i>.</div>
+
+  <h3 id="fragmento">⑦ Fragmento representativo <span class="muted" style="font-size:.8rem">(código)</span></h3>
+  <div class="spoken">
+    "El fragmento que elegí muestra la arquitectura en acción: la <span class="q">búsqueda de modelos</span>, que mezcla nuestros favoritos curados con los resultados de Sketchfab. Acá se ve que el caso de uso <span class="q">no sabe de HTTP ni de SQL</span>: recibe por inyección un puerto del gateway de Sketchfab y otro del repositorio de curados. Y tiene <span class="q">decisiones de diseño escritas en el código</span>: los curados solo se insertan en la primera página, se deduplican los UIDs para no repetir un modelo, y como Sketchfab no da un total real, lo aproximamos."
+  </div>
+  <pre><code><span class="cm">// línea 60 — set de UIDs curados, para deduplicar</span>
+<span class="kw">const</span> curatedUids = <span class="kw">new</span> <span class="ty">Set</span>(curated.<span class="fn">map</span>((c) => c.sketchfabUid));
+
+<span class="cm">// líneas 82-85 — resultados de Sketchfab sin los UIDs ya curados</span>
+<span class="kw">const</span> sketchfabFiltered = sketchfabResult.models
+  .<span class="fn">filter</span>((m) => !curatedUids.<span class="fn">has</span>(m.uid))
+  .<span class="fn">slice</span>(0, remaining)
+  .<span class="fn">map</span>((m) => ({ ...m, isCurated: false }));
+
+<span class="cm">// líneas 91-94 — merge: curados primero, después Sketchfab</span>
+<span class="kw">const</span> data = [...curatedAsEntities, ...sketchfabFiltered];
+<span class="kw">return</span> { data, pagination: { page, limit, total, totalPages } };</code></pre>
+  <div class="note"><b>Archivo exacto:</b> <code>src/application/sketchfab/search-models.use-case.ts</code> → método <code>execute()</code>. <b>Mostrá las líneas 34-39</b> (los puertos inyectados) y <b>46-94</b> (decisión de diseño + dedup + merge). <b>No se ejecuta nada</b>: es código, se abre en el editor y se muestra. Opcional: <code>pnpm jest search-models</code> corre su test en verde. <span class="muted">(El snippet omite anotaciones de tipo para leerse fácil; en el editor mostrás el archivo real.)</span></div>
+
+  <h3 id="demo">⑧ La demo end-to-end 🎬</h3>
+  <div class="spoken">
+    "Y para cerrar, la <span class="q">demo en vivo</span>, que es la prueba de que todo integra. Me logueo en la app productiva; eso valida un JWT contra core. <span class="q">Creo una campaña</span>: cuando guardo, el request viaja del front al gateway y al core, core aplica las reglas y la persiste en Neon. La veo creada en la app. Y para demostrar la integración de punta a punta, voy a la <span class="q">consola de Neon</span> y consulto la tabla campaigns: ahí está la <span class="q">fila que acabo de crear</span>. Y esto no es solo a mano: está cubierto por los <span class="q">tests de integración automatizados</span> que mencioné."
+  </div>
+  <pre><code><span class="kw">SELECT</span> id, title, sector, status, created_at
+<span class="kw">FROM</span> campaigns <span class="kw">WHERE</span> deleted_at <span class="kw">IS NULL</span>
+<span class="kw">ORDER BY</span> created_at <span class="kw">DESC</span> <span class="kw">LIMIT</span> <span class="st">5</span>;  <span class="cm">-- la nueva sale primera</span></code></pre>
+  <div class="note warn"><b>Antes de grabar:</b> calentá core y api (abrí sus <code>/health</code> y esperá el 200), confirmá que el front carga, y dejá la query de Neon ya escrita.</div>
+
+  <div class="note say"><b>Cierre:</b> "Yo me encargué de modelar-core: ___ (dominio / integración Sketchfab / migraciones / tests). Lo vieron funcionando en producción. Gracias."</div>
+  <p><a class="btn" href="guion-4-api.html">← API Gateway</a> <a class="btn" href="coloquio-integrantes.html">Volver al índice</a></p>
+  <p class="foot">modelAR · Guión hablado 5/5</p>
+</div>
+</body>
+</html>
