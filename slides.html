@@ -65,6 +65,30 @@
   .notes .who{color:var(--accent);font-weight:700}
   .notes .cap{color:var(--muted);font-style:italic;display:block;margin-top:6px}
 
+  @media (max-width:768px){
+    body{padding:18px 12px 44px}
+    .howto{font-size:13px;padding:14px 16px;margin-bottom:20px}
+    .slide{
+      width:100%;
+      aspect-ratio:auto;      /* dejá que la slide crezca con su contenido */
+      overflow:visible;       /* no recortar texto en pantallas angostas */
+      padding:24px 20px;
+      border-radius:16px;
+    }
+    .badge{position:static;margin-top:6px}  /* fuera del overlap con el título */
+    .title{font-size:26px;margin-top:14px}
+    .sub{font-size:15px;max-width:100%;margin-top:12px}
+    .meta{font-size:12px}
+    .big{font-size:17px;margin-top:16px}
+    .spacer{margin-top:14px}  /* ya no empuja al fondo: sólo separa */
+    .cards{flex-direction:column;gap:12px;margin-top:18px}  /* tarjetas apiladas */
+    .card{padding:14px 16px}
+    .card h3{font-size:16px}
+    .card p{font-size:14px}
+    .imgbox{font-size:12px;margin-top:16px}
+    .notes{width:100%;font-size:13px;padding:13px 16px;margin-bottom:30px}
+  }
+
   @media print{
     body{background:#fff;padding:0}
     .howto,.notes{display:none}
