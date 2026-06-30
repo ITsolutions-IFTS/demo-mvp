@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>modelAR — Slides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;700;800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07070b; --frame:#0b0b11; --accent:#d6f85b; --card:#14141b;
+    --border:rgba(255,255,255,.08); --text:#f4f4f6; --muted:#9ea4ae;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:"Figtree","DM Sans",system-ui,Arial,sans-serif;
+    padding:34px 16px 60px; line-height:1.4;
+  }
+  .howto{
+    max-width:1280px;margin:0 auto 30px;padding:18px 22px;
+    background:#0f0f15;border:1px solid var(--border);border-radius:12px;
+    color:var(--muted);font-size:14px;
+  }
+  .howto b{color:var(--accent)}
+  .deck{display:flex;flex-direction:column;align-items:center}
+
+  .slide{
+    width:min(1280px,96vw); aspect-ratio:16/9;
+    background:radial-gradient(circle at 112% -12%, rgba(139,92,246,.30), transparent 44%), var(--frame);
+    border:1px solid var(--border); border-radius:22px;
+    padding:clamp(28px,4.2vw,62px);
+    display:flex; flex-direction:column; position:relative; overflow:hidden;
+    box-shadow:0 22px 60px rgba(0,0,0,.55);
+  }
+  .logo{font-family:"DM Sans",sans-serif;font-weight:800;font-size:clamp(17px,1.9vw,26px);letter-spacing:-.01em}
+  .logo span{color:var(--accent)}
+  .badge{position:absolute;top:clamp(26px,3.4vw,40px);right:clamp(28px,4vw,56px);
+    color:var(--muted);font-size:clamp(11px,1vw,14px);font-weight:500}
+  .title{font-family:"DM Sans",sans-serif;font-weight:800;line-height:1.04;
+    font-size:clamp(30px,5.2vw,64px);margin-top:clamp(22px,4vw,54px);letter-spacing:-.015em}
+  .title .ac{color:var(--accent)}
+  .sub{color:var(--muted);font-size:clamp(14px,1.65vw,21px);margin-top:16px;max-width:74%}
+  .meta{color:var(--muted);font-size:clamp(11px,1.15vw,15px);margin-top:14px}
+  .big{font-family:"DM Sans",sans-serif;font-weight:700;font-size:clamp(18px,2.3vw,30px);margin-top:18px}
+  .big .ac{color:var(--accent)}
+
+  .spacer{margin-top:auto}
+  .cards{display:flex;gap:clamp(13px,1.6vw,22px);margin-top:clamp(20px,3vw,40px)}
+  .card{flex:1;background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:clamp(15px,1.7vw,24px)}
+  .card h3{color:var(--accent);font-weight:700;font-size:clamp(14px,1.55vw,20px);
+    display:flex;align-items:center;gap:9px;margin-bottom:9px}
+  .card p{color:var(--muted);font-size:clamp(11.5px,1.2vw,15px);line-height:1.46}
+  .card .k{color:var(--text);font-weight:600}
+
+  .imgbox{margin-top:clamp(16px,2vw,26px);border:1.5px dashed rgba(214,248,91,.45);
+    border-radius:12px;padding:13px 16px;background:rgba(214,248,91,.045);
+    color:var(--muted);font-size:clamp(11px,1.15vw,14px)}
+  .imgbox b{color:var(--accent);font-weight:700}
+
+  .notes{width:min(1280px,96vw);margin:14px auto 46px;background:#0f0f15;
+    border-left:3px solid var(--accent);border-radius:8px;padding:15px 20px;
+    color:#cbd0d6;font-size:14px;line-height:1.5}
+  .notes .who{color:var(--accent);font-weight:700}
+  .notes .cap{color:var(--muted);font-style:italic;display:block;margin-top:6px}
+
+  @media print{
+    body{background:#fff;padding:0}
+    .howto,.notes{display:none}
+    .slide{break-after:page;box-shadow:none;width:100%;border-radius:0;border:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="howto">
+  <b>Cómo usar este archivo:</b> cada bloque oscuro es una slide (16:9) con el estilo de tu PPT.
+  Replicá cada una en PowerPoint/Slides: copiá el texto, y donde dice <b>“IMAGEN”</b> insertá la captura indicada.
+  Debajo de cada slide está el <b>guion (P1 Betania / P2 Matías)</b> para las notas del orador.
+  Tip: <b>Ctrl/Cmd + P → Guardar como PDF</b> exporta solo las slides (las notas se ocultan).
+</div>
+
+<div class="deck">
+
+<!-- ===== SLIDE 1 ===== -->
+<section class="slide">
+  <div class="logo">model<span>AR</span></div>
+  <div class="badge">Slide 1 · P1 (Betania)</div>
+  <h1 class="title"><span class="ac">Tres segundos</span> para el usuario.</h1>
+  <p class="sub">Escaneás un QR y aparece un objeto 3D flotando sobre tu mesa. Sin instalar ninguna app.</p>
+  <div class="spacer"></div>
+  <div class="meta">IFTS N°29 — Tec. Sup. en Desarrollo de Software · González · Spataro · Tamborelli · Luaces · Torcello</div>
+  <div class="imgbox"><b>IMAGEN:</b> foto real — un celular mostrando un modelo 3D apoyado sobre una mesa/piso real (pantalla <i>/ar/:uid</i>).</div>
+</section>
+<div class="notes"><span class="who">P1 (Betania) — arranca directo con el hook:</span><br>
+“Para el usuario, modelAR son tres segundos: escanea un código QR y aparece un objeto 3D flotando sobre su mesa. Sin instalar ninguna app.”</div>
+
+<!-- ===== SLIDE 2 ===== -->
+<section class="slide">
+  <div class="logo">model<span>AR</span></div>
+  <div class="badge">Slide 2 · P1 (Betania)</div>
+  <h1 class="title">Lo que se ve <span class="ac">≠</span> lo que hay detrás</h1>
+  <p class="sub">Lo que se ve: un QR → un objeto 3D en tu mesa. Detrás de esos 3 segundos hay 3 piezas.</p>
+  <div class="cards">
+    <div class="card"><h3>① Multi-tenant</h3><p>Una sola plataforma sirve a muchas marcas, aisladas entre sí.</p></div>
+    <div class="card"><h3>② Arquitectura desacoplada</h3><p>Web, gateway y core separados, comunicados por HTTP.</p></div>
+    <div class="card"><h3>③ Núcleo con Clean Architecture</h3><p>Las reglas de negocio aisladas del resto del sistema.</p></div>
+  </div>
+  <div class="imgbox"><b>IMAGEN:</b> split — izq: foto del celular con AR (real); der: diagrama mini de 3 capas (Web → Gateway → Core). La derecha es un diagrama, no captura.</div>
+</section>
+<div class="notes"><span class="who">P1 (Betania):</span><br>
+“Y esto es, a propósito, así de simple. Pero detrás de esos tres segundos hay una plataforma multi-tenant, una API desacoplada y un núcleo con arquitectura limpia, sirviendo a muchas marcas a la vez. Mi nombre es Betania y formo parte del equipo de modelAR, junto con Matías, Eugenia, Micaela y José. Hoy les mostramos las dos caras; empecemos por la que más nos diferencia.”</div>
+
+<!-- ===== SLIDE 3 ===== -->
+<section class="slide">
+  <div class="logo">model<span>AR</span></div>
+  <div class="badge">Slide 3 · P1 (Betania)</div>
+  <h1 class="title">Una plataforma, <span class="ac">muchas industrias</span></h1>
+  <p class="sub">¿Un colegio y una marca → dos desarrollos? No. Uno solo. La misma plataforma se adapta.</p>
+  <div class="cards">
+    <div class="card"><h3>🎓 Educación</h3><p>La interfaz muestra <span class="k">“Materias”</span>.</p></div>
+    <div class="card"><h3>🛍️ Retail</h3><p>La misma interfaz muestra <span class="k">“Colecciones”</span>.</p></div>
+    <div class="card"><h3>⚙️ Multi-tenant</h3><p>Cambia la terminología y la interfaz, <span class="k">no el código</span>.</p></div>
+  </div>
+  <div class="imgbox"><b>IMAGEN:</b> captura real DOBLE — la misma pantalla del panel en dos tenants: uno dice “Materias” (educativo), otro “Colecciones” (retail), lado a lado.</div>
+</section>
+<div class="notes"><span class="who">P1 (Betania) — termina pasándole a Matías:</span><br>
+“Hoy, si un colegio quiere realidad aumentada para sus clases y una marca la quiere para su catálogo, normalmente hacen falta dos desarrollos distintos. Nosotros lo resolvimos con uno solo: modelAR es multi-tenant. La misma plataforma se adapta a cada industria —al colegio le muestra ‘Materias’, a la empresa ‘Colecciones’—. Cambia la terminología y la interfaz, no el código. Mati nos va a contar cómo se sostiene esto por dentro.”</div>
+
+<!-- ===== SLIDE 4 ===== -->
+<section class="slide">
+  <div class="logo">model<span>AR</span></div>
+  <div class="badge">Slide 4 · P2 (Matías)</div>
+  <h1 class="title">Arquitectura: <span class="ac">3 capas desacopladas</span></h1>
+  <p class="sub">Separamos el sistema en tres capas que se comunican por HTTP.</p>
+  <div class="cards">
+    <div class="card"><h3>🖥️ WEB · React</h3><p>La experiencia del usuario. SPA optimizada con Vite.</p></div>
+    <div class="card"><h3>🛡️ GATEWAY · Express</h3><p>El escudo: lo único expuesto a internet (Helmet, CORS).</p></div>
+    <div class="card"><h3>🧠 CORE · NestJS</h3><p>El cerebro: toda la lógica + PostgreSQL · Redis.</p></div>
+  </div>
+  <div class="big">El core <span class="ac">nunca toca internet</span> directamente → más seguro y escalable.</div>
+  <div class="imgbox"><b>IMAGEN:</b> diagrama (no captura) — WEB → GATEWAY → CORE → PostgreSQL · Redis.</div>
+</section>
+<div class="notes"><span class="who">P2 (Matías):</span><br>
+“Por dentro, lo separamos en tres capas. La web es lo que ve el usuario. El gateway es un escudo: es lo único expuesto a internet, filtra y asegura cada pedido con Helmet y CORS. Y el core, hecho en NestJS, es el cerebro: ahí vive toda la lógica y la base de datos. La clave: el core nunca toca internet directamente — eso lo hace más seguro y nos deja escalar cada capa por separado.”</div>
+
+<!-- ===== SLIDE 5 ===== -->
+<section class="slide">
+  <div class="logo">model<span>AR</span></div>
+  <div class="badge">Slide 5 · P2 (Matías)</div>
+  <h1 class="title">El núcleo: <span class="ac">una decisión clave</span></h1>
+  <p class="sub">Decisión → aislar las reglas de negocio del resto (Clean Architecture). El resultado:</p>
+  <div class="cards">
+    <div class="card"><h3>🔁 Intercambiable</h3><p>Cambiamos la fuente de datos sin tocar una sola regla de negocio.</p></div>
+    <div class="card"><h3>🧪 Testeable</h3><p>Probamos la lógica sin levantar una base de datos.</p></div>
+    <div class="card"><h3>✔️ Confiable</h3><p>Rollback atómico probado (Jest + Vitest): nunca quedan datos a medias.</p></div>
+  </div>
+  <div class="imgbox"><b>IMAGEN:</b> sin captura (conceptual). Opcional: ícono de “círculos concéntricos” (Domain → Application → Infrastructure).</div>
+</section>
+<div class="notes"><span class="who">P2 (Matías):</span><br>
+“Dentro del core tomamos una decisión clave: aislar las reglas de negocio del resto, con arquitectura limpia. ¿Qué ganamos? Dos cosas concretas: podemos cambiar de dónde vienen los datos sin tocar una sola regla de negocio, y podemos testear esa lógica sin levantar una base de datos. Y lo testeamos de verdad: pruebas automatizadas con Jest y Vitest, incluido el rollback atómico —si algo falla a mitad de una operación, no quedan datos a medio guardar—.”</div>
+
+<!-- ===== SLIDE 6 ===== -->
+<section class="slide">
+  <div class="logo">model<span>AR</span></div>
+  <div class="badge">Slide 6 · P2 (Matías)</div>
+  <h1 class="title">Real y <span class="ac">en la nube</span></h1>
+  <p class="sub">No es una maqueta: está desplegado y funcionando.</p>
+  <div class="cards">
+    <div class="card"><h3>▲ Vercel</h3><p>El frontend, distribuido en CDN global.</p></div>
+    <div class="card"><h3>⚙️ Render</h3><p>El API Gateway y el Core.</p></div>
+    <div class="card"><h3>🗄️ Neon</h3><p>La base de datos PostgreSQL serverless.</p></div>
+  </div>
+  <div class="big">Métricas: <span class="ac">vistas QR → activaciones AR → CTA</span></div>
+  <div class="imgbox"><b>IMAGEN:</b> captura real — el dashboard de métricas del panel (<i>/admin/metricas</i>) con sus gráficos.</div>
+</section>
+<div class="notes"><span class="who">P2 (Matías):</span><br>
+“Y todo esto no es una maqueta: está desplegado y funcionando. La web en Vercel, el backend en Render y la base de datos PostgreSQL en Neon. Además, cada interacción se registra: medimos cuántas vistas de QR se convierten en activaciones de AR y en clicks. Le devolvemos a la marca métricas reales de conversión.”</div>
+
+<!-- ===== SLIDE 7 ===== -->
+<section class="slide">
+  <div class="logo">model<span>AR</span></div>
+  <div class="badge">Slide 7 · P1 (Betania)</div>
+  <h1 class="title">Lo que viene: <span class="ac">white-label</span></h1>
+  <p class="sub">La misma plataforma, bajo la marca de cada cliente.</p>
+  <div class="cards">
+    <div class="card"><h3>🎨 Marca propia</h3><p>Su logo, sus colores, su dominio. Como si el producto fuera de ellos.</p></div>
+    <div class="card"><h3>🧩 Una base, muchas marcas</h3><p>Otras empresas lo ofrecen a sus propios clientes.</p></div>
+  </div>
+  <div class="big"><span class="ac">model-ar-web.vercel.app</span> &nbsp;·&nbsp; ¡Gracias!</div>
+  <div class="imgbox"><b>IMAGEN:</b> mockup — la misma pantalla con dos “pieles” de marca (Marca A vs Marca B), lado a lado. Plan B: collage (panel admin + AR en celular + pantalla de QR).</div>
+</section>
+<div class="notes"><span class="who">P1 (Betania):</span><br>
+“Y para cerrar: les prometimos las dos caras de modelAR y se las mostramos. Esa base multi-tenant nos abre la puerta a que cada cliente use la plataforma bajo su propia marca —su logo, sus colores, su dominio—, como si el producto fuera de ellos. Eso convierte a modelAR de una herramienta en algo que otras empresas pueden ofrecer a sus propios clientes: una sola base técnica, muchas marcas encima. Muchas gracias por su atención, visiten nuestro sitio.”</div>
+
+</div>
+</body>
+</html>
