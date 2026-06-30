@@ -1,0 +1,47 @@
+name: keep-render-awake
+
+# Pinguea los /health de modelAR-api y modelar-core en Render para que el free
+# tier no los duerma (~15 min sin tráfico). Reemplaza al cron local, que se
+# perdía corridas cuando la laptop estaba suspendida. Corre en la nube de GitHub.
+
+on:
+  schedule:
+    # Cada 5 min (UTC). El cron de Actions suele atrasarse algunos minutos bajo
+    # carga, así que 5 da margen frente al sleep de 15 min de Render.
+    - cron: "*/5 * * * *"
+  workflow_dispatch: {}   # permite dispararlo a mano desde la pestaña Actions
+
+permissions:
+  contents: read
+
+concurrency:
+  group: keep-render-awake
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping health endpoints
+        run: |
+          set -u
+          urls=(
+            "https://modelar-api.onrender.com/health"
+            "https://modelar-core.onrender.com/health"
+          )
+          fail=0
+          for u in "${urls[@]}"; do
+            echo "→ $u"
+            # --retry absorbe blips transitorios; --max-time 90 cubre el cold
+            # start (~42 s) sin cortar la conexión.
+            out=$(curl -s -o /dev/null -w "%{http_code} %{time_total}s" \
+                  --retry 3 --retry-all-errors --retry-delay 10 \
+                  --max-time 90 "$u") || true
+            echo "   $out"
+            http=${out%% *}
+            if [ "$http" != "200" ]; then
+              echo "   ⚠️  respuesta no-200"
+              fail=1
+            fi
+          done
+          exit $fail
