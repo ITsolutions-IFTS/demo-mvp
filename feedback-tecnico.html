@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>modelAR — Documentación Técnica (Q&A Conexión IT)</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2430; --border:#2d3643;
+    --txt:#e6edf3; --muted:#9aa7b4; --accent:#58a6ff; --accent2:#7ee787;
+    --warn:#f0a85f; --pink:#ff7b9c; --purple:#a371f7;
+    --mono:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.62;font-size:16px}
+  .wrap{max-width:1080px;margin:0 auto;padding:44px 24px 90px}
+  h1{font-size:2.05rem;margin:0 0 4px;letter-spacing:-.5px}
+  h1 small{display:block;font-size:1.02rem;color:var(--muted);font-weight:400;margin-top:8px;line-height:1.5}
+  h2{font-size:1.4rem;margin:52px 0 14px;padding-bottom:9px;border-bottom:1px solid var(--border);scroll-margin-top:20px}
+  h2 .n{color:var(--accent);font-family:var(--mono);font-size:1rem;margin-right:10px}
+  h3{font-size:1.1rem;margin:26px 0 8px}
+  h4{font-size:.94rem;margin:20px 0 6px;color:var(--accent2);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono)}
+  p{margin:10px 0}
+  .muted{color:var(--muted)} .lead{font-size:1.08rem;color:#c9d4df}
+  code{font-family:var(--mono);background:var(--panel2);padding:2px 6px;border-radius:5px;font-size:.85em;color:var(--accent2)}
+  pre{background:#0a0e14;border:1px solid var(--border);border-radius:10px;padding:15px 17px;overflow-x:auto;font-family:var(--mono);font-size:.82rem;line-height:1.55;margin:13px 0}
+  pre code{background:none;padding:0;color:#d6e2ee}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin:16px 0}
+  ul{margin:9px 0;padding-left:22px} li{margin:5px 0}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.89rem}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+  th{color:var(--accent);font-weight:600;font-size:.76rem;text-transform:uppercase;letter-spacing:.4px}
+  tr:last-child td{border-bottom:none}
+  td .ok{color:var(--accent2);font-weight:600}
+  td .bad{color:var(--pink);font-weight:600}
+  td .mid{color:var(--warn);font-weight:600}
+  .flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;margin:20px 0;justify-content:center}
+  .node{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:11px 15px;text-align:center;min-width:118px}
+  .node .t{font-weight:600;font-size:.92rem} .node .s{font-size:.7rem;color:var(--muted);font-family:var(--mono)}
+  .node.web{border-color:#a371f7} .node.api{border-color:var(--warn)} .node.core{border-color:var(--accent2)} .node.db{border-color:var(--accent)}
+  .arrow{display:flex;flex-direction:column;justify-content:center;color:var(--muted);padding:0 6px;font-family:var(--mono);font-size:.66rem;text-align:center}
+  .arrow .big{font-size:1.3rem;line-height:1}
+  .note{background:var(--panel2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 16px;margin:15px 0;font-size:.92rem}
+  .note.warn{border-left-color:var(--warn)} .note.good{border-left-color:var(--accent2)} .note.bad{border-left-color:var(--pink)}
+  .note b{color:var(--txt)}
+  .pill{display:inline-block;background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:3px 9px;font-family:var(--mono);font-size:.77rem;margin:2px 4px 2px 0}
+  .toc{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px 22px;margin:26px 0;columns:2;column-gap:30px}
+  .toc a{color:var(--accent);text-decoration:none;display:block;padding:3px 0;font-size:.91rem}
+  .toc a:hover{text-decoration:underline}
+  .qa{border-left:4px solid var(--purple);background:linear-gradient(90deg,rgba(163,113,247,.06),transparent);border-radius:0 10px 10px 0;padding:10px 18px;margin:16px 0}
+  .qa b{color:var(--purple)}
+  .subgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+  .subgrid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:14px 0}
+  .chip{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.5px;padding:3px 9px;border-radius:20px;white-space:nowrap;display:inline-block}
+  .chip.done{background:rgba(126,231,135,.15);color:var(--accent2)}
+  .chip.wip{background:rgba(240,168,95,.15);color:var(--warn)}
+  .chip.todo{background:rgba(255,123,156,.15);color:var(--pink)}
+  @media(max-width:760px){.toc{columns:1}.flow{flex-direction:column;align-items:center}.arrow{transform:rotate(90deg);padding:4px 0}.subgrid,.subgrid3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>modelAR — Documentación Técnica
+    <small>Guía de referencia para el feedback de la 1° Jornada Conexión IT · pensada para responder preguntas del jurado sobre arquitectura, decisiones de diseño y estado real del desarrollo.</small>
+  </h1>
+
+  <div class="toc">
+    <a href="#proyecto">① Qué es modelAR y cómo se comunican los 3 módulos</a>
+    <a href="#por-que-3">② Por qué 3 módulos separados</a>
+    <a href="#core">③ modelar-core — arquitectura y patrones</a>
+    <a href="#api">④ modelAR-api — el gateway</a>
+    <a href="#web">⑤ modelAR-web — frontend</a>
+    <a href="#db">⑥ Base de datos y por qué Neon</a>
+    <a href="#deploy">⑦ Por qué Render (api/core) y Vercel (web)</a>
+    <a href="#seguridad">⑧ Seguridad</a>
+    <a href="#tests">⑨ Testing por módulo</a>
+    <a href="#awake">⑩ Cómo se mantiene el sistema despierto</a>
+    <a href="#whitelabel">⑪ White-label: cómo funciona realmente</a>
+    <a href="#ia3d">⑫ El desarrollo a medias: generación de modelos 3D con IA</a>
+    <a href="#herramientas">⑬ Por qué Tripo (y alternativas gratuitas evaluadas)</a>
+  </div>
+
+  <!-- ============ PROYECTO ============ -->
+  <h2 id="proyecto"><span class="n">01</span>Qué es modelAR y cómo se comunican los 3 módulos</h2>
+  <p><b>modelAR</b> es una plataforma <b>multi-tenant "app-less" de Realidad Aumentada web</b>: una empresa arma campañas con modelos 3D, genera un <b>QR</b>, y cualquier cliente final abre ese QR desde el navegador de su celular y ve el modelo en AR sin instalar nada. Además hay un panel de <b>métricas</b> de interacción. Tres repos independientes, cada uno con un rol fijo:</p>
+  <div class="flow">
+    <div class="node web"><div class="t">modelAR-web</div><div class="s">React 19 + Vite</div></div>
+    <div class="arrow"><span class="big">→</span><span>HTTP/JSON</span></div>
+    <div class="node api"><div class="t">modelAR-api</div><div class="s">Gateway · Express</div></div>
+    <div class="arrow"><span class="big">→</span><span>HTTP/JSON</span></div>
+    <div class="node core"><div class="t">modelar-core</div><div class="s">NestJS · lógica</div></div>
+    <div class="arrow"><span class="big">→</span><span>SQL / Redis</span></div>
+    <div class="node db"><div class="t">Neon + Redis</div><div class="s">Postgres · cache</div></div>
+  </div>
+  <p class="muted" style="text-align:center;font-size:.9rem">El navegador nunca habla directo con <code>core</code>: todo pasa por el gateway. <code>core</code> es el único que toca la base de datos.</p>
+  <ul>
+    <li><b>modelAR-web</b> no sabe nada de la base ni de reglas de negocio: solo consume una API vía fetch/axios contra el gateway (con proxy de Vite a <code>/api</code> en local).</li>
+    <li><b>modelAR-api</b> es un <b>proxy fino</b>: reenvía cada request tal cual al core (agrega <code>x-request-id</code>, propaga IP del cliente, aplica timeout de 10s → <code>503</code> si el core no responde). No valida JWT, no toca la base, no tiene lógica de negocio.</li>
+    <li><b>modelar-core</b> concentra <b>toda</b> la lógica: auth, campañas, colecciones, catálogo, analytics, generación 3D. Es el único con credenciales de base de datos.</li>
+  </ul>
+
+  <!-- ============ POR QUE 3 MODULOS ============ -->
+  <h2 id="por-que-3"><span class="n">02</span>Por qué 3 módulos separados (y no un monolito)</h2>
+  <div class="qa"><b>Pregunta esperada:</b> "¿por qué no hicieron todo en un solo backend?"</div>
+  <ul>
+    <li><b>Frontera de seguridad real:</b> el único proceso con acceso a la base de datos y a Redis es <code>core</code>. Si mañana <code>modelAR-web</code> se sirve desde un CDN público y alguien intenta explotar el frontend, no hay ningún camino directo a la base: todo pasa por un proxy que no razona sobre SQL ni sabe qué es una campaña.</li>
+    <li><b>Contrato estable frente a evolución interna:</b> el gateway expone una API pública fija; adentro, <code>core</code> puede cambiar de ORM, refactorizar casos de uso o reordenar capas sin romper a nadie que consuma el gateway.</li>
+    <li><b>Escalado y deploy independientes:</b> se puede re-desplegar el frontend sin tocar el backend, o escalar el gateway (más tráfico público) sin escalar el core (más carga transaccional) de la misma forma.</li>
+    <li><b>Costura para crecer:</b> sumar otro frontend (una app mobile nativa, un panel de otro cliente) implica consumir el mismo gateway, sin duplicar lógica de negocio.</li>
+    <li><b>Alineado con el equipo:</b> 5 integrantes, 3 repos con dueños claros — cada quien puede iterar y deployar su parte sin bloquear a los demás (ver ramas activas por integrante en cada repo).</li>
+  </ul>
+  <p class="muted">En términos de patrones: esto es el patrón <b>API Gateway</b> hacia afuera, combinado con <b>Ports &amp; Adapters (arquitectura hexagonal)</b> puertas adentro en <code>core</code>.</p>
+
+  <!-- ============ CORE ============ -->
+  <h2 id="core"><span class="n">03</span>modelar-core — arquitectura y patrones de diseño</h2>
+  <p><b>NestJS + TypeScript</b>, arquitectura <b>hexagonal (Clean Architecture)</b> con 4 capas, dependencias en un solo sentido:</p>
+  <ul>
+    <li><code>domain/</code> — entidades puras y <i>puertos</i> (interfaces de repositorio/servicio). No importa nada de NestJS ni de Sequelize.</li>
+    <li><code>application/</code> — los <b>casos de uso</b> (un archivo por operación: <code>create-generation.use-case.ts</code>, <code>login.use-case.ts</code>, etc.). Acá vive la lógica de negocio.</li>
+    <li><code>infrastructure/</code> — los <i>adapters</i>: repositorios Sequelize, cache Redis, clientes de APIs externas (Sketchfab, Tripo).</li>
+    <li><code>modules/</code> — controllers NestJS + wiring de inyección de dependencias (DTOs, guards, decorators).</li>
+  </ul>
+  <p class="muted">Regla de oro: <b>domain no depende de nadie</b> → la lógica se testea con mocks, sin levantar una base real, y se puede cambiar de proveedor/ORM sin tocar las reglas de negocio.</p>
+
+  <h4>Módulos de negocio</h4>
+  <table>
+    <tr><th>Módulo</th><th>Responsabilidad</th></tr>
+    <tr><td><b>auth</b></td><td>Login/registro, JWT access + refresh con rotación, guards por rol.</td></tr>
+    <tr><td><b>organizations</b></td><td>Tenants. Cada cliente pertenece a una org; toda query se aísla por tenant.</td></tr>
+    <tr><td><b>campaigns</b></td><td>Entidad central: título, sector, modelo 3D, QR, CTA, estado, soft delete.</td></tr>
+    <tr><td><b>collections</b></td><td>Agrupan campañas (FK <code>ON DELETE SET NULL</code>).</td></tr>
+    <tr><td><b>sketchfab + curated-models</b></td><td>Catálogo: API externa de Sketchfab + favoritos curados propios (<code>source: sketchfab | local</code>).</td></tr>
+    <tr><td><b>catalog</b></td><td>Destacados del home público (mezcla curados + Sketchfab, resiliente si Sketchfab falla).</td></tr>
+    <tr><td><b>analytics</b></td><td>Tracking de eventos del visor + métricas por campaña.</td></tr>
+    <tr><td><b>generation</b> <span class="chip wip">a medias</span></td><td>Generación de modelos 3D con IA (texto/imagen → GLB). Ver §12.</td></tr>
+  </table>
+
+  <h4>Patrones de diseño concretos (con evidencia real)</h4>
+  <table>
+    <tr><th>Patrón</th><th>Dónde y cómo</th></tr>
+    <tr><td><b>Repository</b></td><td>Puertos como <code>i-generation-job.repository.ts</code> (domain) implementados por clases Sequelize en <code>infrastructure/persistence/</code>. Los casos de uso nunca importan Sequelize.</td></tr>
+    <tr><td><b>Dependency Injection por tokens</b></td><td>NestJS bindea interfaces a implementaciones vía <code>Symbol</code> (ej. <code>GENERATION_PROVIDER</code>, <code>ASSET_STORAGE</code>) en cada <code>*.module.ts</code>. El caso de uso pide "un puerto", no "una clase".</td></tr>
+    <tr><td><b>Strategy</b> (el más vistoso)</td><td>El puerto <code>I3DGenerationProvider</code> tiene dos implementaciones intercambiables por <b>env var</b>: <code>FakeGenerationProvider</code> (default, sin costo) y <code>TripoGenerationProvider</code> (real). Lo mismo con <code>IAssetStorage</code>: <code>PassthroughStorage</code> vs <code>R2Storage</code>. Comentario textual del código: <i>"cambiar de proveedor/storage = una env var, sin tocar use cases ni DB"</i>.</td></tr>
+    <tr><td><b>Factory</b></td><td><code>cache.factory.ts</code> construye las opciones de Redis; el <code>useFactory</code> de <code>generation.module.ts</code> decide qué adapter instanciar según config.</td></tr>
+    <tr><td><b>DTO + validación declarativa</b></td><td><code>class-validator</code> con <code>ValidationPipe</code> global (<code>whitelist + forbidNonWhitelisted</code>). Ej: <code>CreateGenerationDto</code> valida distinto según <code>kind: 'text' | 'image'</code> con <code>@ValidateIf</code>.</td></tr>
+    <tr><td><b>Unit of Work / transacción atómica</b></td><td>Crear una campaña con colección nueva (<code>newCollectionName</code>) inserta ambas filas en una sola transacción — evita colecciones huérfanas (bug real detectado y corregido, ver hallazgo multi-tenant).</td></tr>
+    <tr><td><b>Errores de dominio canónicos</b></td><td>Jerarquía (<code>NotFoundError</code>, <code>ExternalServiceError</code>, etc.) que un filtro global mapea a una respuesta HTTP uniforme con código + status + <code>requestId</code>.</td></tr>
+    <tr><td><b>Append-only ledger</b></td><td><code>generation_usage</code>: nunca se actualiza, solo se inserta una fila por uso consumido — patrón de auditoría simple y confiable para contar cupos.</td></tr>
+  </table>
+  <h4>Redis</h4>
+  <p>Cache distribuido (<code>cache-manager-redis-yet</code>) para resultados de catálogo/Sketchfab con invalidación en cada mutación, y soporte de <b>rate limiting</b> (<code>@nestjs/throttler</code>, ej. <code>@Throttle({limit:10, ttl:60_000})</code> en el endpoint de generación).</p>
+
+  <!-- ============ API ============ -->
+  <h2 id="api"><span class="n">04</span>modelAR-api — el gateway</h2>
+  <p>Node.js + <b>Express</b>, deliberadamente minimalista: <b>3 archivos</b> en <code>src/</code> (<code>main.ts</code>, <code>proxy/forward.ts</code>, <code>config/env.ts</code>), <b>4 dependencias de runtime</b> (<code>express</code>, <code>helmet</code>, <code>cors</code>, <code>dotenv</code>).</p>
+  <ul>
+    <li>Un único handler <code>forward()</code> reenvía las <b>32 rutas</b> declaradas a <code>CORE_URL</code> usando <code>fetch</code> nativo (sin librerías de proxy).</li>
+    <li>Agrega <code>x-request-id</code> (tracing) y propaga la IP real del cliente para que el <b>rate-limit por IP se aplique en el core</b>.</li>
+    <li><code>AbortController</code> con timeout de 10s → si el core no responde, devuelve <code>503</code> con un cuerpo de error uniforme.</li>
+    <li><code>/health</code> hace un fetch al <code>/health</code> del core (timeout 5s) y responde <code>{status:'ok', core:'ok'|'unavailable'}</code> — siempre 200, informando el estado real del core en el body.</li>
+  </ul>
+  <div class="note warn"><b>Honestidad para el Q&A:</b> Helmet y CORS están con configuración <b>default</b> (CORS totalmente abierto), y el gateway <b>no reenvía cookies</b> en ninguna dirección — la autenticación viaja por header <code>Authorization</code>, no por cookie httpOnly. Es un gap conocido, no un olvido silencioso.</div>
+
+  <!-- ============ WEB ============ -->
+  <h2 id="web"><span class="n">05</span>modelAR-web — frontend</h2>
+  <p><span class="pill">React 19</span><span class="pill">TypeScript</span><span class="pill">Vite 6</span><span class="pill">@google/model-viewer 4.2</span><span class="pill">Three.js 0.182</span><span class="pill">Vitest + Testing Library</span></p>
+  <ul>
+    <li><b>Estado:</b> React Context (no Redux/Zustand) — <code>AuthContext</code>, <code>CampaignsContext</code>, <code>CollectionsContext</code>, <code>OrganizationsContext</code>.</li>
+    <li><b>Visor AR "app-less":</b> <code>&lt;model-viewer ar-modes="scene-viewer webxr quick-look"&gt;</code> — intenta, en orden, Scene Viewer nativo de Android, WebXR del navegador, y Quick Look de iOS; degradación progresiva sin instalar nada. Para casos que necesitan más control hay una superficie custom con Three.js (<code>ThreeARSurface.tsx</code>, <code>ARButton</code> + <code>GLTFLoader</code> de WebXR).</li>
+    <li><b>Estructura:</b> <code>admin/</code> (panel superadmin/cliente: campañas, colecciones, catálogo, métricas) separado de las páginas públicas (<code>ARPage</code>, catálogo público, escaneo de QR).</li>
+    <li>Pre-commit con <b>Husky + lint-staged</b> (parte de por qué la ficha marca "nivel profesional").</li>
+  </ul>
+
+  <!-- ============ DB ============ -->
+  <h2 id="db"><span class="n">06</span>Base de datos y por qué Neon</h2>
+  <p><b>PostgreSQL</b> gestionado con <b>Sequelize</b>, esquema versionado en <b>13 migraciones</b> (no hay <code>sync()</code> mágico en producción). Tablas: <span class="pill">clients</span><span class="pill">organizations</span><span class="pill">campaigns</span><span class="pill">collections</span><span class="pill">analytics_events</span><span class="pill">curated_models</span><span class="pill">refresh_tokens</span><span class="pill">generation_usage</span><span class="pill">generation_jobs</span></p>
+  <h4>Patrones de datos aplicados</h4>
+  <ul>
+    <li><b>UUID</b> como PK en todas las tablas.</li>
+    <li><b>Soft delete</b>: <code>deleted_at</code> + <code>paranoid</code> en campañas (no se borra físico).</li>
+    <li><b>Multi-tenant por clave denormalizada</b>: <code>org_slug</code>/<code>organization_id</code> en vez de un esquema por tenant. Se detectó y corrigió un bug real de integridad (clientes con <code>org_slug</code> sin fila viva en <code>organizations</code>) con una migración de backfill + validación simétrica en collections/campaigns — buen ejemplo de "encontramos un hallazgo de diseño y lo resolvimos con datos reales", no teoría.</li>
+    <li><b>Índice único parcial</b> en <code>slug</code> (permite reciclar el slug de una org borrada sin re-enganchar datos viejos).</li>
+    <li><b>Ledger append-only</b> con 3 índices por eje de identidad (<code>user_id</code>/<code>ip_hash</code>/<code>device_id</code>) para contar cupos sin locks ni updates.</li>
+    <li><b>ENUM a nivel DB</b> para estados (ej. <code>generation_jobs.status</code>).</li>
+    <li><b>Mapeo snake_case (DB) ↔ camelCase (código)</b> aislado en la capa de infraestructura — el dominio nunca ve nombres de columna.</li>
+  </ul>
+  <div class="qa"><b>Pregunta esperada:</b> "¿por qué Neon y no otra base en la nube?"</div>
+  <ul>
+    <li><b>Postgres estándar, sin lock-in</b>: es el protocolo de cable habitual, funciona directo con <code>pg</code>/Sequelize — cero reescritura de código vs. una NoSQL propietaria (DynamoDB, Firestore).</li>
+    <li><b>Serverless con scale-to-zero</b>: no cobra por cómputo ocioso — clave para un proyecto académico sin presupuesto de infra.</li>
+    <li><b>Branching de base de datos</b>: se pueden crear ramas de la DB (clon instantáneo) para probar migraciones sin arriesgar producción.</li>
+    <li><b>Free tier generoso</b> sin tarjeta de crédito, suficiente para el volumen de una demo/MVP.</li>
+  </ul>
+
+  <!-- ============ DEPLOY ============ -->
+  <h2 id="deploy"><span class="n">07</span>Por qué Render (api + core) y Vercel (web)</h2>
+  <div class="subgrid">
+    <div class="card">
+      <h4 style="margin-top:0">Render para api + core</h4>
+      <p>Ambos son <b>procesos Node de larga duración</b>: el core mantiene una conexión persistente a Redis y a Postgres. Vercel está pensado para <b>funciones serverless</b> con límite de tiempo de ejecución y cold-start por invocación — un mal fit para un proceso con estado y conexiones abiertas. Render da un <b>contenedor persistente real</b> (Docker-friendly), con <code>/health</code> propio.</p>
+      <p class="muted">Trade-off aceptado a propósito: el free tier de Render duerme tras 15 min sin tráfico. Se mitiga activamente (ver §10) — no es un problema ignorado.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">Vercel para web</h4>
+      <p>Es una <b>SPA estática</b> (build de Vite) que solo habla HTTP con el gateway — no necesita servidor propio. Vercel está diseñado exactamente para esto: <b>CDN global</b>, deploys sin configuración desde GitHub, y <b>preview deployments por PR</b>, muy útil para que las 5 personas del equipo revisen cambios de UI antes de mergear.</p>
+    </div>
+  </div>
+
+  <!-- ============ SEGURIDAD ============ -->
+  <h2 id="seguridad"><span class="n">08</span>Seguridad</h2>
+  <ul>
+    <li><b>JWT access + refresh</b> con <b>rotación</b>: el refresh token se guarda hasheado con <code>bcrypt</code> en <code>refresh_tokens</code> — un leak de la base no expone tokens usables.</li>
+    <li><b>Passwords</b>: <code>bcryptjs</code> (hash con cost factor, ver seeders/migración del superadmin).</li>
+    <li><b>Guards</b> por rol (superadmin vs cliente) + validación de ownership por organización en cada caso de uso (parte del fix multi-tenant).</li>
+    <li><b>Rate limiting real</b> en el core (<code>@nestjs/throttler</code>), no en el gateway — el gateway solo propaga la IP.</li>
+    <li><b>Validación estricta de entrada</b>: <code>ValidationPipe</code> global con <code>whitelist</code> (descarta campos no declarados) + <code>forbidNonWhitelisted</code> (rechaza el request si vienen campos extra).</li>
+  </ul>
+
+  <!-- ============ TESTS ============ -->
+  <h2 id="tests"><span class="n">09</span>Testing por módulo</h2>
+  <table>
+    <tr><th>Módulo</th><th>Framework</th><th>Qué hay</th><th>Nivel</th></tr>
+    <tr><td><b>modelar-core</b></td><td>Jest + supertest</td><td><b>37</b> <code>*.spec.ts</code> (unitarios: casos de uso con puertos mockeados) + <b>2</b> <code>*.e2e-spec.ts</code> + suite de <b>integración</b> separada (<code>test:integration</code>, repos contra Postgres real) + <code>test:cov</code>.</td><td><span class="ok">Sólido — 3 niveles</span></td></tr>
+    <tr><td><b>modelAR-web</b></td><td>Vitest + Testing Library</td><td><b>4</b> archivos de test. Husky + lint-staged en pre-commit.</td><td><span class="mid">Liviano</span></td></tr>
+    <tr><td><b>modelAR-api</b></td><td>—</td><td><b>0</b> tests: es un proxy fino sin lógica de negocio propia (el timeout/whitelist merecería tests básicos).</td><td><span class="bad">Gap conocido</span></td></tr>
+  </table>
+  <p class="muted">La ficha marca "nivel profesional" citando testing + Vercel + Neon; esto es exacto para <code>core</code> y razonable para <code>web</code>, y es honesto reconocer que <code>api</code> es la parte más floja en cobertura — buena respuesta si preguntan por debilidades.</p>
+
+  <!-- ============ AWAKE ============ -->
+  <h2 id="awake"><span class="n">10</span>Cómo se mantiene el sistema despierto (Render free tier)</h2>
+  <p>El free tier de Render duerme un servicio tras <b>~15 min sin tráfico entrante</b>; el próximo request paga un cold-start de 30-60s. Se resolvió con un <b>health-check externo automatizado</b>, no manual:</p>
+  <ul>
+    <li><b>GitHub Actions</b> (<code>.github/workflows/keep-render-awake.yml</code> en <code>demo-mvp</code>): <code>cron: */5 * * * *</code>, hace <code>curl</code> a <code>/health</code> de <code>modelar-api</code> y <code>modelar-core</code> en Render cada 5 minutos.</li>
+    <li>Como el <code>/health</code> del gateway ya hace fetch al <code>/health</code> del core, un solo ping externo verifica y despierta ambos servicios.</li>
+    <li>Iteración previa: un <code>crontab</code> personal (cada 10 min, script <code>keep-render-awake.sh</code>) que dependía de que una laptop estuviera prendida — se migró a CI porque <b>no depende de ninguna persona</b>, corre siempre en la infraestructura de GitHub.</li>
+  </ul>
+  <div class="note good"><b>Para el Q&A:</b> es un buen ejemplo de "detectamos una limitación real de infraestructura gratuita y la resolvimos con automatización, no ignorándola ni pagando un plan pago innecesario para una demo académica".</div>
+
+  <!-- ============ WHITE LABEL ============ -->
+  <h2 id="whitelabel"><span class="n">11</span>White-label: cómo funciona realmente</h2>
+  <p>Cada <code>Organization</code> tiene un campo <code>sector</code> (<code>ecommerce | turismo | educacion | inmobiliario | museo</code>) — un único campo, mínimo, que vive en el dominio/DB del core. Todo lo demás es <b>puramente de presentación, resuelto en el frontend</b>, en un mapa <code>SECTOR_UI</code>:</p>
+  <table>
+    <tr><th>Sector</th><th>Label de colección</th><th>CTA</th></tr>
+    <tr><td>Ecommerce</td><td>Categoría / Categorías</td><td>"ver producto"</td></tr>
+    <tr><td>Turismo</td><td>Destino / Destinos</td><td>"más info"</td></tr>
+    <tr><td>Educación</td><td>Serie / Series</td><td>"ir al sitio"</td></tr>
+    <tr><td>Inmobiliario</td><td>Proyecto / Proyectos</td><td>"ver unidades"</td></tr>
+    <tr><td>Museo</td><td>Sala / Salas</td><td>"más info"</td></tr>
+  </table>
+  <p>Una función <code>enrichOrg()</code> combina la organización real (que viene de la API) con esta tabla de UI, en el cliente. El comentario del propio código lo deja explícito: <i>"estos campos NO viven en la API... son decisiones de presentación que cada cliente del web aplica localmente"</i> — mantiene el dominio mínimo en el core y evita ensuciar la base con strings de interfaz.</p>
+  <p><b>Resultado concreto:</b> un museo y una inmobiliaria comparten exactamente el mismo motor (auth, campañas, colecciones, analytics, la tabla <code>collections</code> es literalmente la misma), pero uno ve "Salas" y el otro "Proyectos" para la misma entidad.</p>
+  <div class="note warn"><b>Alcance honesto:</b> hoy el white-label cubre <b>terminología + color de acento por sector</b> (un preset fijo de 5 sectores), no todavía <b>logo/dominio propio por tenant</b>. El próximo paso natural para un white-label "completo" es agregar campos por organización (<code>logo_url</code>, <code>primary_color</code>, <code>custom_domain</code>) y aplicarlos en runtime — misma arquitectura (una capa de presentación por org), solo que respaldada en DB en vez de un preset estático por sector.</div>
+
+  <!-- ============ IA 3D ============ -->
+  <h2 id="ia3d"><span class="n">12</span>El desarrollo a medias: generación de modelos 3D con IA</h2>
+  <p>Hoy los modelos 3D salen de buscar en <b>Sketchfab</b> (biblioteca externa) o de un catálogo de <b>curados propios</b> (<code>curated_models</code>, con <code>source: sketchfab | local</code>). La evolución en curso es permitir que el propio cliente <b>genere su modelo 3D con IA</b> (a partir de texto o de una imagen) en vez de depender de un banco de modelos ajeno.</p>
+  <div class="note bad"><b>Estado real:</b> en <code>modelar-core</code>, sobre la rama <code>feat/catalog-category</code>, existe una arquitectura <b>completa</b> para esto — pero <b>el 100% de esos archivos aparece como <code>untracked</code> en git: nunca se commiteó.</b> Es exactamente el "desarrollo local a medias" que hay que terminar.</p></div>
+
+  <h4>Lo que ya está construido <span class="chip done">hecho</span></h4>
+  <ul>
+    <li><b>Dominio completo</b>: <code>GenerationJobEntity</code>, <code>GenerationStatus</code>, <code>Plan</code> (hoy todo es <code>FREE</code>, el cobro no está implementado), puertos <code>IGenerationJobRepository</code>, <code>IGenerationUsageRepository</code>, <code>IAssetStorage</code>, <code>I3DGenerationProvider</code>.</li>
+    <li><b>Casos de uso</b>: crear/consultar/listar generaciones + <code>GenerationQuotaService</code> (cupo gratuito mensual, <code>GENERATION_FREE_MONTHLY_LIMIT=3</code>, contado por la unión de <code>user_id</code> / <code>ip_hash</code> / <code>device_id</code> — cubre tanto usuarios logueados como anónimos).</li>
+    <li><b>Adapter real funcionando</b>: <code>TripoGenerationProvider</code> contra la API de Tripo3D (OpenAPI v2), con tests, más un <code>FakeGenerationProvider</code> (default) para desarrollar sin gastar créditos.</li>
+    <li><b>Storage swappeable</b>: <code>PassthroughStorage</code> (default, devuelve la URL del proveedor tal cual) y <code>R2Storage</code> (Cloudflare R2, re-hosteo durable) — elegibles 100% por env var, sin tocar casos de uso.</li>
+    <li><b>Persistencia</b>: migraciones <code>12-generation_usage</code> (ledger append-only) y <code>13-generation_jobs</code> (provider, kind, prompt/imageUrl, status, progress, model_url/thumbnail_url).</li>
+    <li><b>API</b>: <code>POST /generation</code> (texto o imagen, <code>402</code> si agotó cupo, throttle 10/min), <code>GET /generation</code>, <code>GET /generation/:id</code> (poll de progreso).</li>
+    <li><b>Tests</b>: specs de casos de uso, del cupo, del adapter de Tripo, y hasta un e2e.</li>
+  </ul>
+
+  <h4>Lo que falta <span class="chip todo">pendiente</span></h4>
+  <ol>
+    <li><b>Commitear el módulo</b> — hoy es puro working tree local; no existe en ningún remoto ni en <code>master</code>. Se pierde si no se resguarda ya.</li>
+    <li><b>Wire en el gateway</b>: <code>modelAR-api</code> whitelistea 32 rutas y <b>ninguna es <code>/api/generation</code></b> — sin esto, el front no puede llegar al endpoint aunque exista en el core.</li>
+    <li><b>UI en el frontend</b>: no hay ninguna pantalla de generación (prompt/imagen → esperar → ver resultado); <code>modelAR-web</code> no tiene código relacionado.</li>
+    <li><b>Storage productivo sin aprovisionar</b>: <code>R2Storage</code> falla rápido si faltan envs (<code>R2_ACCOUNT_ID</code>, <code>R2_ACCESS_KEY_ID</code>, <code>R2_SECRET_ACCESS_KEY</code>, <code>R2_BUCKET</code>, <code>R2_PUBLIC_BASE_URL</code>) y ninguna está en <code>.env.example</code> — hoy correría en modo <i>passthrough</i>, con URLs de Tripo que <b>caducan</b>.</li>
+    <li><b>Cerrar el loop hacia el catálogo</b>: el resultado (<code>model_url</code>/<code>thumbnail_url</code>) queda en <code>generation_jobs</code> pero nada lo persiste automáticamente como un <code>curated_models</code> con <code>source=local</code> — ese paso conectaría "generé un modelo" con "me aparece en el catálogo para usarlo en una campaña".</li>
+  </ol>
+
+  <h4>Próximo paso concreto, en orden</h4>
+  <ol>
+    <li>Commitear + pushear el módulo <code>generation</code> a una rama (protege el trabajo ya hecho).</li>
+    <li>Sumar las 3 rutas de <code>/api/generation</code> a la whitelist del gateway — mecánico, mismo patrón que las 32 rutas existentes.</li>
+    <li>Aprovisionar un bucket de <b>Cloudflare R2</b> (free tier: 10GB + sin costo de egress) y cargar las 5 env vars — sin esto el passthrough es un riesgo real.</li>
+    <li>UI mínima: formulario (prompt o imagen) → <code>POST /generation</code> → poll <code>GET /generation/:id</code> → mostrar el GLB en el mismo <code>&lt;model-viewer&gt;</code> que ya se usa para Sketchfab (cero componentes nuevos de visualización).</li>
+    <li>Conectar el resultado exitoso a <code>curated-models</code> (<code>source=local</code>) para que el modelo generado sea reutilizable como cualquier otro del catálogo.</li>
+  </ol>
+
+  <!-- ============ HERRAMIENTAS ============ -->
+  <h2 id="herramientas"><span class="n">13</span>Por qué Tripo (y qué alternativas gratuitas se evaluaron)</h2>
+  <p>El puerto <code>I3DGenerationProvider</code> se diseñó <b>agnóstico a propósito</b> — el propio código lo dice: <i>"denominador común que cumplen TODOS (Tripo, Meshy, Hunyuan3D...): polling"</i>. Se evaluaron varias opciones y se arrancó implementando Tripo3D por motivos concretos:</p>
+  <ul>
+    <li><b>Free tier real</b>: 300 créditos/mes sin tarjeta de crédito — alcanza para una demo académica sin gastar un peso.</li>
+    <li><b>API REST simple, async job + polling</b>: encaja 1:1 con el patrón <code>createJob</code>/<code>getJob</code> que ya se necesitaba para no bloquear el request HTTP mientras el modelo se genera (puede tardar decenas de segundos).</li>
+    <li><b>Texto→3D e imagen→3D con el mismo endpoint</b>: cubre ambos casos (<code>kind: 'text' | 'image'</code>) ya modelados en el DTO, sin dos integraciones distintas.</li>
+    <li><b>Exporta GLB (con PBR opcional)</b>: mismo formato que ya consumen <code>@google/model-viewer</code> y el <code>GLTFLoader</code> de Three.js en el visor existente — cero cambios en el pipeline de renderizado AR.</li>
+  </ul>
+  <h4>Alternativas ya contempladas por la abstracción (solo requieren un nuevo adapter, no tocar casos de uso)</h4>
+  <table>
+    <tr><th>Opción</th><th>Tipo</th><th>Por qué se consideró / cuándo tendría sentido</th></tr>
+    <tr><td><b>Meshy</b></td><td>Cloud, free tier</td><td>También sin tarjeta, exporta 7 formatos (incluye GLB) — buen respaldo o comparación de calidad frente a Tripo.</td></tr>
+    <tr><td><b>Hyper3D Rodin</b></td><td>Cloud, free tier</td><td>Generación muy rápida (~5s geometría) — interesante si la latencia percibida por el usuario es crítica.</td></tr>
+    <tr><td><b>Hunyuan3D-2 / TRELLIS / Stable Fast 3D</b></td><td>Open-source, auto-hospedado</td><td>Sin costo por modelo generado, pero requieren GPU propia. Tiene sentido migrar acá <b>si el volumen crece</b> y el costo por-modelo de las APIs cloud deja de ser conveniente — la arquitectura ya lo permite sin reescribir nada del lado del core.</td></tr>
+  </table>
+  <div class="note good"><b>La frase para el jurado:</b> "no apostamos a un solo proveedor: diseñamos un puerto común y hoy tenemos el adapter de Tripo funcionando; si Tripo cambia sus precios o límites, swappear a Meshy o a un modelo open-source auto-hospedado es una variable de entorno, no una reescritura."</div>
+
+  <p style="margin-top:48px;text-align:center;color:var(--muted);font-size:.85rem">modelAR · ITSolutions AR — Documentación técnica para feedback · 1° Jornada Conexión IT 2026</p>
+
+</div>
+</body>
+</html>
